@@ -4,6 +4,7 @@ import healthRoutes from "./routes/healthRoutes";
 import featureRoutes from "./routes/featureRoutes";
 import { errorHandler } from "./middleware/errorHandler";
 import { notFound } from "./middleware/notFound";
+import jobRoutes from "./routes/jobRoutes";
 
 const app = express();
 
@@ -12,7 +13,7 @@ app.use(express.json());
 
 app.use("/health", healthRoutes);
 app.use("/api/features", featureRoutes);
-
+app.use("/api/jobs", jobRoutes);
 
 
 
