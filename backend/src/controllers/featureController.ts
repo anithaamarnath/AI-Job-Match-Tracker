@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { getAppFeatures } from "../services/featureService";
 
 export const getFeatures = (req: Request, res: Response) => {
