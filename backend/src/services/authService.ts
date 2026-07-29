@@ -6,7 +6,11 @@ import {
   findUserByEmail,
 } from "../repositories/userRepository.js";
 
-import type { RegisterInput } from "../validators/authValidator.js";
+import type { 
+  LoginInput,
+  RegisterInput 
+} from "../validators/authValidator.js";
+
 import { AppError } from "../utils/AppError.js";
 
 const SALT_ROUNDS = 12;
@@ -50,6 +54,34 @@ export const registerUser = async (data: RegisterInput) => {
 
   return {
     user,
+    token,
+  };
+};
+export const loginUser = async (data: LoginInput) => {
+  const user = await findUserByEmail(data.email);
+
+  if (!user) {
+    throw new AppError("Invalid email or password", 401);
+  }
+
+  const passwordMatches = await bcrypt.compare(
+    data.password,
+    user.passwordHash
+  );
+
+  if (!passwordMatches) {
+    throw new AppError("Invalid email or password", 401);
+  }
+
+  const token = createAccessToken(user.id);
+
+  return {
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      createdAt: user.createdAt,
+    },
     token,
   };
 };
