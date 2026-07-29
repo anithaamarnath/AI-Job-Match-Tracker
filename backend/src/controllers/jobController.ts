@@ -1,9 +1,21 @@
-import type { NextFunction, Request, Response } from "express";
+import type {
+  NextFunction,
+  Request,
+  Response,
+} from "express";
+
 import {
   createJob as createJobService,
+  deleteJob as deleteJobService,
   getAllJobs as getAllJobsService,
+  getJobById as getJobByIdService,
+  updateJob as updateJobService,
 } from "../services/jobService";
-import type { CreateJobInput } from "../validators/jobValidator";
+
+import type {
+  CreateJobInput,
+  UpdateJobInput,
+} from "../validators/jobValidator";
 
 export const createJob = async (
   req: Request<object, object, CreateJobInput>,
@@ -24,7 +36,7 @@ export const createJob = async (
 };
 
 export const getAllJobs = async (
-  req: Request,
+  _req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
@@ -35,6 +47,61 @@ export const getAllJobs = async (
       success: true,
       count: jobs.length,
       data: jobs,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getJobById = async (
+  req: Request<{ id: string }>,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const job = await getJobByIdService(req.params.id);
+
+    res.status(200).json({
+      success: true,
+      data: job,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateJob = async (
+  req: Request<{ id: string }, object, UpdateJobInput>,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const job = await updateJobService(
+      req.params.id,
+      req.body
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Job updated successfully",
+      data: job,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteJob = async (
+  req: Request<{ id: string }>,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    await deleteJobService(req.params.id);
+
+    res.status(200).json({
+      success: true,
+      message: "Job deleted successfully",
     });
   } catch (error) {
     next(error);
