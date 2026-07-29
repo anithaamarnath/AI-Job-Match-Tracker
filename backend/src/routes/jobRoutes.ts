@@ -3,23 +3,24 @@ import { Router } from "express";
 import {
   createJob,
   deleteJob,
-  getAllJobs,
+  getJobs,
   getJobById,
   updateJob,
-} from "../controllers/jobController";
+} from "../controllers/jobController.js";
 
-import { validateRequest } from "../middleware/validateRequest";
 import { authenticate } from "../middleware/authMiddleware.js";
+import { validateRequest } from "../middleware/validateRequest.js";
+
 import {
   createJobSchema,
   updateJobSchema,
-} from "../validators/jobValidator";
+} from "../validators/jobValidator.js";
 
 const router = Router();
 
 router.use(authenticate);
 
-router.get("/", getAllJobs);
+router.get("/", getJobs);
 router.get("/:id", getJobById);
 
 router.post(

@@ -10,20 +10,32 @@ import {
   getAllJobs as getAllJobsService,
   getJobById as getJobByIdService,
   updateJob as updateJobService,
-} from "../services/jobService";
+} from "../services/jobService.js";
 
-import type {
-  CreateJobInput,
-  UpdateJobInput,
-} from "../validators/jobValidator";
+import { AppError } from "../utils/AppError.js";
+
+const getAuthenticatedUserId = (req: Request): string => {
+  const userId = req.user?.id;
+
+  if (!userId) {
+    throw new AppError("Authentication required", 401);
+  }
+
+  return userId;
+};
 
 export const createJob = async (
-  req: Request<object, object, CreateJobInput>,
+  req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
-    const job = await createJobService(req.body);
+    const userId = getAuthenticatedUserId(req);
+
+    const job = await createJobService(
+      userId,
+      req.body
+    );
 
     res.status(201).json({
       success: true,
@@ -35,17 +47,18 @@ export const createJob = async (
   }
 };
 
-export const getAllJobs = async (
-  _req: Request,
+export const getJobs = async (
+  req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
-    const jobs = await getAllJobsService();
+    const userId = getAuthenticatedUserId(req);
+
+    const jobs = await getAllJobsService(userId);
 
     res.status(200).json({
       success: true,
-      count: jobs.length,
       data: jobs,
     });
   } catch (error) {
@@ -54,12 +67,17 @@ export const getAllJobs = async (
 };
 
 export const getJobById = async (
-  req: Request<{ id: string }>,
+  req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
-    const job = await getJobByIdService(req.params.id);
+    const userId = getAuthenticatedUserId(req);
+
+    const job = await getJobByIdService(
+      userId,
+      req.params.id
+    );
 
     res.status(200).json({
       success: true,
@@ -71,12 +89,15 @@ export const getJobById = async (
 };
 
 export const updateJob = async (
-  req: Request<{ id: string }, object, UpdateJobInput>,
+  req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
+    const userId = getAuthenticatedUserId(req);
+
     const job = await updateJobService(
+      userId,
       req.params.id,
       req.body
     );
@@ -92,12 +113,17 @@ export const updateJob = async (
 };
 
 export const deleteJob = async (
-  req: Request<{ id: string }>,
+  req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
-    await deleteJobService(req.params.id);
+    const userId = getAuthenticatedUserId(req);
+
+    await deleteJobService(
+      userId,
+      req.params.id
+    );
 
     res.status(200).json({
       success: true,

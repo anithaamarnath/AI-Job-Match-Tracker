@@ -4,25 +4,31 @@ import {
   getAllJobs as getAllJobsRepository,
   getJobById as getJobByIdRepository,
   updateJob as updateJobRepository,
-} from "../repositories/jobRepository";
+} from "../repositories/jobRepository.js";
 
 import type {
   CreateJobData,
   UpdateJobData,
-} from "../repositories/jobRepository";
+} from "../repositories/jobRepository.js";
 
-import { AppError } from "../utils/AppError";
+import { AppError } from "../utils/AppError.js";
 
-export const createJob = async (data: CreateJobData) => {
-  return createJobRepository(data);
+export const createJob = async (
+  userId: string,
+  data: CreateJobData
+) => {
+  return createJobRepository(userId, data);
 };
 
-export const getAllJobs = async () => {
-  return getAllJobsRepository();
+export const getAllJobs = async (userId: string) => {
+  return getAllJobsRepository(userId);
 };
 
-export const getJobById = async (id: string) => {
-  const job = await getJobByIdRepository(id);
+export const getJobById = async (
+  userId: string,
+  jobId: string
+) => {
+  const job = await getJobByIdRepository(userId, jobId);
 
   if (!job) {
     throw new AppError("Job not found", 404);
@@ -32,16 +38,32 @@ export const getJobById = async (id: string) => {
 };
 
 export const updateJob = async (
-  id: string,
+  userId: string,
+  jobId: string,
   data: UpdateJobData
 ) => {
-  await getJobById(id);
+  const job = await updateJobRepository(
+    userId,
+    jobId,
+    data
+  );
 
-  return updateJobRepository(id, data);
+  if (!job) {
+    throw new AppError("Job not found", 404);
+  }
+
+  return job;
 };
 
-export const deleteJob = async (id: string) => {
-  await getJobById(id);
+export const deleteJob = async (
+  userId: string,
+  jobId: string
+) => {
+  const job = await deleteJobRepository(userId, jobId);
 
-  return deleteJobRepository(id);
+  if (!job) {
+    throw new AppError("Job not found", 404);
+  }
+
+  return job;
 };

@@ -5,10 +5,9 @@ import type {
 } from "express";
 
 import jwt from "jsonwebtoken";
-
 import { AppError } from "../utils/AppError.js";
 
-interface JwtPayload {
+interface AccessTokenPayload {
   userId: string;
 }
 
@@ -20,39 +19,50 @@ export const authenticate = (
   try {
     const authorizationHeader = req.headers.authorization;
 
-    if (
-      !authorizationHeader ||
-      !authorizationHeader.startsWith("Bearer ")
-    ) {
-      throw new AppError("Authentication token is required", 401);
+    if (!authorizationHeader) {
+      next(new AppError("Authentication token is required", 401));
+      return;
     }
 
-    const token = authorizationHeader.split(" ")[1];
+    const [scheme, token] = authorizationHeader.split(" ");
 
-    if (!token) {
-      throw new AppError("Authentication token is required", 401);
+    if (scheme !== "Bearer" || !token) {
+      next(
+        new AppError(
+          "Authentication token must use the Bearer format",
+          401
+        )
+      );
+      return;
     }
 
     const secret = process.env.JWT_SECRET;
 
     if (!secret) {
-      throw new Error("JWT_SECRET is not configured");
+      next(new Error("JWT_SECRET is not configured"));
+      return;
     }
 
-    const decoded = jwt.verify(token, secret) as JwtPayload;
+    const decoded = jwt.verify(
+      token,
+      secret
+    ) as AccessTokenPayload;
+
+    if (!decoded.userId) {
+      next(new AppError("Invalid authentication token", 401));
+      return;
+    }
 
     req.user = {
       id: decoded.userId,
     };
-
+    console.log("Authenticated user:", req.user);
     next();
   } catch (error) {
-    if (error instanceof AppError) {
-      next(error);
-      return;
-    }
-
-    if (error instanceof jwt.JsonWebTokenError) {
+    if (
+      error instanceof jwt.JsonWebTokenError ||
+      error instanceof jwt.TokenExpiredError
+    ) {
       next(new AppError("Invalid or expired token", 401));
       return;
     }
