@@ -1,5 +1,6 @@
-import { NextFunction, Request, Response } from "express";
-import { ZodError, ZodType } from "zod";
+import type { NextFunction, Request, Response } from "express";
+import { ZodError } from "zod";
+import type { ZodType } from "zod";
 
 export const validateRequest =
   (schema: ZodType) =>
@@ -9,11 +10,7 @@ export const validateRequest =
     next: NextFunction
   ): Response | void => {
     try {
-      schema.parse({
-        body: req.body,
-        params: req.params,
-        query: req.query
-      });
+      req.body = schema.parse(req.body);
 
       next();
     } catch (error) {
@@ -23,8 +20,8 @@ export const validateRequest =
           message: "Validation failed",
           errors: error.issues.map((issue) => ({
             field: issue.path.join("."),
-            message: issue.message
-          }))
+            message: issue.message,
+          })),
         });
       }
 
