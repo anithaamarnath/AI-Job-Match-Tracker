@@ -56,7 +56,7 @@ export const authenticate = (
     req.user = {
       id: decoded.userId,
     };
-    console.log("Authenticated user:", req.user);
+  
     next();
   } catch (error) {
     if (
