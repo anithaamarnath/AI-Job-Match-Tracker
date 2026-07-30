@@ -385,7 +385,8 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 export const ModelName = {
   User: 'User',
-  Job: 'Job'
+  Job: 'Job',
+  JobMatch: 'JobMatch'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -401,7 +402,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "job"
+    modelProps: "user" | "job" | "jobMatch"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -553,6 +554,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    JobMatch: {
+      payload: Prisma.$JobMatchPayload<ExtArgs>
+      fields: Prisma.JobMatchFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.JobMatchFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobMatchPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.JobMatchFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobMatchPayload>
+        }
+        findFirst: {
+          args: Prisma.JobMatchFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobMatchPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.JobMatchFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobMatchPayload>
+        }
+        findMany: {
+          args: Prisma.JobMatchFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobMatchPayload>[]
+        }
+        create: {
+          args: Prisma.JobMatchCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobMatchPayload>
+        }
+        createMany: {
+          args: Prisma.JobMatchCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.JobMatchCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobMatchPayload>[]
+        }
+        delete: {
+          args: Prisma.JobMatchDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobMatchPayload>
+        }
+        update: {
+          args: Prisma.JobMatchUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobMatchPayload>
+        }
+        deleteMany: {
+          args: Prisma.JobMatchDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.JobMatchUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.JobMatchUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobMatchPayload>[]
+        }
+        upsert: {
+          args: Prisma.JobMatchUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JobMatchPayload>
+        }
+        aggregate: {
+          args: Prisma.JobMatchAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateJobMatch>
+        }
+        groupBy: {
+          args: Prisma.JobMatchGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.JobMatchGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.JobMatchCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.JobMatchCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -618,6 +693,22 @@ export const JobScalarFieldEnum = {
 export type JobScalarFieldEnum = (typeof JobScalarFieldEnum)[keyof typeof JobScalarFieldEnum]
 
 
+export const JobMatchScalarFieldEnum = {
+  id: 'id',
+  resume: 'resume',
+  jobDescription: 'jobDescription',
+  matchScore: 'matchScore',
+  matchedSkills: 'matchedSkills',
+  missingSkills: 'missingSkills',
+  recommendations: 'recommendations',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  userId: 'userId'
+} as const
+
+export type JobMatchScalarFieldEnum = (typeof JobMatchScalarFieldEnum)[keyof typeof JobMatchScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -679,6 +770,20 @@ export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'In
  * Reference to a field of type 'Int[]'
  */
 export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Float'
+ */
+export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
+    
+
+
+/**
+ * Reference to a field of type 'Float[]'
+ */
+export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
     
 
 /**
@@ -793,6 +898,7 @@ export type PrismaClientOptions = ({
 export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
   job?: Prisma.JobOmit
+  jobMatch?: Prisma.JobMatchOmit
 }
 
 /* Types for Logging */

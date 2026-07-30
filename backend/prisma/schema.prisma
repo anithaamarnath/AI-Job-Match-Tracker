@@ -16,7 +16,8 @@ model User {
     createdAt    DateTime @default(now())
     updatedAt    DateTime @updatedAt
 
-    jobs Job[]
+    jobs       Job[]
+    jobMatches JobMatch[]
 }
 
 model Job {
@@ -30,4 +31,21 @@ model Job {
 
     userId String
     user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model JobMatch {
+    id              String   @id @default(cuid())
+    resume          String
+    jobDescription  String
+    matchScore      Int
+    matchedSkills   String[]
+    missingSkills   String[]
+    recommendations String[]
+    createdAt       DateTime @default(now())
+    updatedAt       DateTime @updatedAt
+
+    userId String
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId])
 }

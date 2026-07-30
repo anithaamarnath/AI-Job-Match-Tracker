@@ -1,4 +1,5 @@
 import type { JobMatchInput } from "../validators/jobMatchValidator.js";
+import { createJobMatch } from "../repositories/jobMatchRepository.js";
 
 export interface JobMatchResult {
   matchScore: number;
@@ -79,8 +80,9 @@ const skills: SkillDefinition[] = [
     name: "REST API",
     aliases: [
       "rest api",
-      "rest APIs",
+      "rest apis",
       "restful api",
+      "restful apis",
       "restful services",
     ],
   },
@@ -128,10 +130,7 @@ const skills: SkillDefinition[] = [
   },
   {
     name: "Lightning Web Components",
-    aliases: [
-      "lightning web components",
-      "lwc",
-    ],
+    aliases: ["lightning web components", "lwc"],
   },
 ];
 
@@ -153,6 +152,7 @@ const containsSkill = (
 };
 
 export const analyzeJobMatch = async (
+  userId: string,
   data: JobMatchInput
 ): Promise<JobMatchResult> => {
   const resumeText = normalizeText(data.resume);
@@ -200,10 +200,22 @@ export const analyzeJobMatch = async (
               `Consider adding relevant experience, projects, or achievements involving ${skill}.`
           );
 
-  return {
+  const result: JobMatchResult = {
     matchScore,
     matchedSkills,
     missingSkills,
     recommendations,
   };
+
+  await createJobMatch({
+    userId,
+    resume: data.resume,
+    jobDescription: data.jobDescription,
+    matchScore: result.matchScore,
+    matchedSkills: result.matchedSkills,
+    missingSkills: result.missingSkills,
+    recommendations: result.recommendations,
+  });
+
+  return result;
 };

@@ -52,7 +52,8 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   User: 'User',
-  Job: 'Job'
+  Job: 'Job',
+  JobMatch: 'JobMatch'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -95,6 +96,22 @@ export const JobScalarFieldEnum = {
 } as const
 
 export type JobScalarFieldEnum = (typeof JobScalarFieldEnum)[keyof typeof JobScalarFieldEnum]
+
+
+export const JobMatchScalarFieldEnum = {
+  id: 'id',
+  resume: 'resume',
+  jobDescription: 'jobDescription',
+  matchScore: 'matchScore',
+  matchedSkills: 'matchedSkills',
+  missingSkills: 'missingSkills',
+  recommendations: 'recommendations',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  userId: 'userId'
+} as const
+
+export type JobMatchScalarFieldEnum = (typeof JobMatchScalarFieldEnum)[keyof typeof JobMatchScalarFieldEnum]
 
 
 export const SortOrder = {

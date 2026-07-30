@@ -51,3 +51,8 @@ export type User = Prisma.UserModel
  * 
  */
 export type Job = Prisma.JobModel
+/**
+ * Model JobMatch
+ * 
+ */
+export type JobMatch = Prisma.JobMatchModel
