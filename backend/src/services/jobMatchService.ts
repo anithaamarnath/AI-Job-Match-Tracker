@@ -7,15 +7,203 @@ export interface JobMatchResult {
   recommendations: string[];
 }
 
+interface SkillDefinition {
+  name: string;
+  aliases: string[];
+}
+
+const skills: SkillDefinition[] = [
+  {
+    name: "JavaScript",
+    aliases: ["javascript"],
+  },
+  {
+    name: "TypeScript",
+    aliases: ["typescript"],
+  },
+  {
+    name: "React",
+    aliases: ["react", "react.js", "reactjs"],
+  },
+  {
+    name: "Node.js",
+    aliases: ["node.js", "nodejs", "node js"],
+  },
+  {
+    name: "Express",
+    aliases: ["express", "express.js", "expressjs"],
+  },
+  {
+    name: "PostgreSQL",
+    aliases: ["postgresql", "postgres", "psql"],
+  },
+  {
+    name: "MySQL",
+    aliases: ["mysql"],
+  },
+  {
+    name: "Prisma",
+    aliases: ["prisma", "prisma orm"],
+  },
+  {
+    name: "MongoDB",
+    aliases: ["mongodb", "mongo db"],
+  },
+  {
+    name: "AWS",
+    aliases: ["aws", "amazon web services"],
+  },
+  {
+    name: "Docker",
+    aliases: ["docker", "containerization"],
+  },
+  {
+    name: "Git",
+    aliases: ["git"],
+  },
+  {
+    name: "GitHub Actions",
+    aliases: ["github actions"],
+  },
+  {
+    name: "CI/CD",
+    aliases: [
+      "ci/cd",
+      "ci cd",
+      "continuous integration",
+      "continuous delivery",
+      "continuous deployment",
+    ],
+  },
+  {
+    name: "REST API",
+    aliases: [
+      "rest api",
+      "rest APIs",
+      "restful api",
+      "restful services",
+    ],
+  },
+  {
+    name: "GraphQL",
+    aliases: ["graphql"],
+  },
+  {
+    name: "HTML",
+    aliases: ["html", "html5"],
+  },
+  {
+    name: "CSS",
+    aliases: ["css", "css3"],
+  },
+  {
+    name: "Jest",
+    aliases: ["jest"],
+  },
+  {
+    name: "Testing",
+    aliases: [
+      "testing",
+      "unit testing",
+      "integration testing",
+      "end-to-end testing",
+      "e2e testing",
+    ],
+  },
+  {
+    name: "Python",
+    aliases: ["python"],
+  },
+  {
+    name: "Java",
+    aliases: ["java"],
+  },
+  {
+    name: "Salesforce",
+    aliases: ["salesforce"],
+  },
+  {
+    name: "Apex",
+    aliases: ["apex"],
+  },
+  {
+    name: "Lightning Web Components",
+    aliases: [
+      "lightning web components",
+      "lwc",
+    ],
+  },
+];
+
+const normalizeText = (text: string): string => {
+  return text
+    .toLowerCase()
+    .replace(/[^\w\s.+/#-]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+};
+
+const containsSkill = (
+  text: string,
+  aliases: string[]
+): boolean => {
+  return aliases.some((alias) =>
+    text.includes(normalizeText(alias))
+  );
+};
+
 export const analyzeJobMatch = async (
   data: JobMatchInput
 ): Promise<JobMatchResult> => {
+  const resumeText = normalizeText(data.resume);
+  const jobDescriptionText = normalizeText(
+    data.jobDescription
+  );
+
+  const requiredSkills = skills.filter((skill) =>
+    containsSkill(jobDescriptionText, skill.aliases)
+  );
+
+  const matchedSkills = requiredSkills
+    .filter((skill) =>
+      containsSkill(resumeText, skill.aliases)
+    )
+    .map((skill) => skill.name);
+
+  const missingSkills = requiredSkills
+    .filter(
+      (skill) =>
+        !containsSkill(resumeText, skill.aliases)
+    )
+    .map((skill) => skill.name);
+
+  const matchScore =
+    requiredSkills.length === 0
+      ? 0
+      : Math.round(
+          (matchedSkills.length /
+            requiredSkills.length) *
+            100
+        );
+
+  const recommendations =
+    requiredSkills.length === 0
+      ? [
+          "No recognized technical skills were found in the job description.",
+        ]
+      : missingSkills.length === 0
+        ? [
+            "Your resume matches all identified skills in the job description.",
+          ]
+        : missingSkills.map(
+            (skill) =>
+              `Consider adding relevant experience, projects, or achievements involving ${skill}.`
+          );
+
   return {
-    matchScore: 0,
-    matchedSkills: [],
-    missingSkills: [],
-    recommendations: [
-      "Keyword matching will be added in the next step."
-    ]
+    matchScore,
+    matchedSkills,
+    missingSkills,
+    recommendations,
   };
 };
