@@ -1,5 +1,11 @@
 import type { JobMatchInput } from "../validators/jobMatchValidator.js";
-import { createJobMatch } from "../repositories/jobMatchRepository.js";
+import { createJobMatch,
+    getJobMatchById,
+    getJobMatchesByUserId
+ } from "../repositories/jobMatchRepository.js";
+
+
+ import { AppError } from "../utils/AppError.js";
 
 export interface JobMatchResult {
   matchScore: number;
@@ -219,3 +225,21 @@ export const analyzeJobMatch = async (
 
   return result;
 };
+
+export const getMatchHistory = async (userId: string) => {
+  return getJobMatchesByUserId(userId);
+};
+
+export const getMatchHistoryById = async (
+  userId: string,
+  matchId: string
+) => {
+  const match = await getJobMatchById(userId, matchId);
+
+  if (!match) {
+    throw new AppError("Job match result not found", 404);
+  }
+
+  return match;
+};
+

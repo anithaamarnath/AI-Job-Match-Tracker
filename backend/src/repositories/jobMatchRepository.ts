@@ -38,3 +38,15 @@ export const getJobMatchesByUserId = async (
     },
   });
 };
+
+export const getJobMatchById = async (
+  userId: string,
+  matchId: string
+) => {
+  return prisma.jobMatch.findFirst({
+    where: {
+      id: matchId,
+      userId,
+    },
+  });
+};
