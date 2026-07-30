@@ -6,6 +6,7 @@ import { errorHandler } from "./middleware/errorHandler";
 import { notFound } from "./middleware/notFound";
 import jobRoutes from "./routes/jobRoutes";
 import authRoutes from "./routes/authRoutes";
+import jobMatchRoutes from "./routes/jobMatchRoutes.js";
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use("/health", healthRoutes);
 app.use("/api/features", featureRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/match", jobMatchRoutes);
 
 
 
