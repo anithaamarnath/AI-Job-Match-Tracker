@@ -1,6 +1,7 @@
 import { Router } from "express";
 
 import { 
+  deleteJobMatchHistoryById,
   getJobMatchHistory,
   getJobMatchHistoryById,
   matchJob
@@ -23,11 +24,18 @@ router.get(
   getJobMatchHistory
 );
 
+router.delete(
+  "/history/:id",
+  authenticate,
+  deleteJobMatchHistoryById
+);
+
 router.post(
   "/",
   authenticate,
   validateRequest(jobMatchSchema),
   matchJob
 );
+
 
 export default router;

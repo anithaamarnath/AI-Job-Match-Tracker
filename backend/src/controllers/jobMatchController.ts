@@ -6,6 +6,7 @@ import type {
 
 import { 
   analyzeJobMatch,
+  deleteMatchHistoryById,
   getMatchHistory,
   getMatchHistoryById
  } from "../services/jobMatchService.js";
@@ -91,3 +92,29 @@ export const getJobMatchHistoryById = async (
     next(error);
   }
 };
+export const deleteJobMatchHistoryById = async (
+  req: Request<{ id: string }>,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const userId = req.user?.id;
+
+    if (!userId) {
+      throw new AppError("User is not authenticated", 401);
+    }
+
+    await deleteMatchHistoryById(
+      userId,
+      req.params.id
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Job match result deleted successfully",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+

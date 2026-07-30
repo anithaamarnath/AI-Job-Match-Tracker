@@ -1,7 +1,9 @@
 import type { JobMatchInput } from "../validators/jobMatchValidator.js";
-import { createJobMatch,
-    getJobMatchById,
-    getJobMatchesByUserId
+import { 
+  createJobMatch,
+  getJobMatchById,
+  deleteJobMatchById,
+  getJobMatchesByUserId
  } from "../repositories/jobMatchRepository.js";
 
 
@@ -242,4 +244,16 @@ export const getMatchHistoryById = async (
 
   return match;
 };
+
+export const deleteMatchHistoryById = async (
+  userId: string,
+  matchId: string
+) => {
+  const result = await deleteJobMatchById(userId, matchId);
+
+  if (result.count === 0) {
+    throw new AppError("Job match result not found", 404);
+  }
+};
+
 

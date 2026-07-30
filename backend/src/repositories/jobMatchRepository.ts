@@ -50,3 +50,15 @@ export const getJobMatchById = async (
     },
   });
 };
+
+export const deleteJobMatchById = async (
+  userId: string,
+  matchId: string
+) => {
+  return prisma.jobMatch.deleteMany({
+    where: {
+      id: matchId,
+      userId,
+    },
+  });
+};
