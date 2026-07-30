@@ -32,3 +32,8 @@ export type Job = Prisma.JobModel
  * 
  */
 export type JobMatch = Prisma.JobMatchModel
+/**
+ * Model Resume
+ * 
+ */
+export type Resume = Prisma.ResumeModel

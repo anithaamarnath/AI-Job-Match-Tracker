@@ -1,6 +1,11 @@
 import { Router } from "express";
 
-import { uploadResumeFile } from "../controllers/resumeController.js";
+import {
+  deleteResume,
+  getResume,
+  getResumes,
+  uploadResumeFile,
+} from "../controllers/resumeController.js";
 import { authenticate } from "../middleware/authMiddleware.js";
 import { uploadResume } from "../middleware/uploadMiddleware.js";
 
@@ -12,5 +17,25 @@ router.post(
   uploadResume.single("resume"),
   uploadResumeFile
 );
+
+router.get(
+  "/",
+  authenticate,
+  getResumes
+);
+
+router.get(
+  "/:id",
+  authenticate,
+  getResume
+);
+
+router.delete(
+  "/:id",
+  authenticate,
+  deleteResume
+);
+
+
 
 export default router;

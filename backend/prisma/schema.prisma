@@ -18,6 +18,7 @@ model User {
 
     jobs       Job[]
     jobMatches JobMatch[]
+    resumes    Resume[]
 }
 
 model Job {
@@ -43,6 +44,24 @@ model JobMatch {
     recommendations String[]
     createdAt       DateTime @default(now())
     updatedAt       DateTime @updatedAt
+
+    userId String
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId])
+}
+
+model Resume {
+    id String @id @default(cuid())
+
+    originalName String
+    storedName   String
+    filePath     String
+
+    extractedText String @db.Text
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 
     userId String
     user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
