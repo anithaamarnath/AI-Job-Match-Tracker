@@ -9,6 +9,11 @@ import multer from "multer";
 
 import { AppError } from "../utils/AppError.js";
 
+interface BodyParserError extends SyntaxError {
+  status?: number;
+  type?: string;
+}
+
 export const errorHandler: ErrorRequestHandler = (
   error: unknown,
   _req: Request,
@@ -37,6 +42,21 @@ export const errorHandler: ErrorRequestHandler = (
     res.status(error.statusCode).json({
       success: false,
       message: error.message,
+    });
+
+    return;
+  }
+
+  const bodyParserError = error as BodyParserError;
+
+  if (
+    bodyParserError instanceof SyntaxError &&
+    bodyParserError.status === 400 &&
+    bodyParserError.type === "entity.parse.failed"
+  ) {
+    res.status(400).json({
+      success: false,
+      message: "Invalid JSON body",
     });
 
     return;

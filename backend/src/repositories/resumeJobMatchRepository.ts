@@ -21,3 +21,70 @@ export const saveResumeJobMatch = async (
   });
 };
 
+export const getResumeJobMatches = async (
+  userId: string
+) => {
+  return prisma.resumeJobMatch.findMany({
+    where: {
+      userId,
+    },
+    include: {
+      resume: {
+        select: {
+          id: true,
+          originalName: true,
+        },
+      },
+      job: {
+        select: {
+          id: true,
+          company: true,
+          role: true,
+        },
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+};
+
+export const getResumeJobMatchById = async (
+  userId: string,
+  matchId: string
+) => {
+  return prisma.resumeJobMatch.findFirst({
+    where: {
+      id: matchId,
+      userId,
+    },
+    include: {
+      resume: {
+        select: {
+          id: true,
+          originalName: true,
+        },
+      },
+      job: {
+        select: {
+          id: true,
+          company: true,
+          role: true,
+          description: true,
+        },
+      },
+    },
+  });
+};
+
+export const deleteResumeJobMatchById = async (
+  userId: string,
+  matchId: string
+) => {
+  return prisma.resumeJobMatch.deleteMany({
+    where: {
+      id: matchId,
+      userId,
+    },
+  });
+};

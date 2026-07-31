@@ -2,7 +2,12 @@ import { getResumeById } from "../repositories/resumeRepository.js";
 import { getJobById } from "../repositories/jobRepository.js";
 import { AppError } from "../utils/AppError.js";
 import { detectSkills } from "./resumeAnalyzerService.js";
-import { saveResumeJobMatch } from "../repositories/resumeJobMatchRepository.js";
+import { 
+  deleteResumeJobMatchById,
+  getResumeJobMatchById,
+  getResumeJobMatches,
+  saveResumeJobMatch 
+} from "../repositories/resumeJobMatchRepository.js";
 
 export interface ResumeJobMatchResult {
   matchScore: number;
@@ -89,6 +94,8 @@ export const calculateResumeJobMatch = async (
     );
   });
 
+  
+
 
 
 
@@ -117,6 +124,48 @@ await saveResumeJobMatch({
 });
 
 return result;
+};
+
+export const getResumeJobMatchHistory = async (
+  userId: string
+) => {
+  return getResumeJobMatches(userId);
+};
+
+export const getResumeJobMatchHistoryById = async (
+  userId: string,
+  matchId: string
+) => {
+  const match = await getResumeJobMatchById(
+    userId,
+    matchId
+  );
+
+  if (!match) {
+    throw new AppError(
+      "Resume-job match result not found",
+      404
+    );
+  }
+
+  return match;
+};
+
+export const deleteResumeJobMatchHistoryById = async (
+  userId: string,
+  matchId: string
+) => {
+  const result = await deleteResumeJobMatchById(
+    userId,
+    matchId
+  );
+
+  if (result.count === 0) {
+    throw new AppError(
+      "Resume-job match result not found",
+      404
+    );
+  }
 };
 
 
