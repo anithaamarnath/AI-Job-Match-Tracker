@@ -54,7 +54,8 @@ export const ModelName = {
   User: 'User',
   Job: 'Job',
   JobMatch: 'JobMatch',
-  Resume: 'Resume'
+  Resume: 'Resume',
+  ResumeJobMatch: 'ResumeJobMatch'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -132,6 +133,25 @@ export const ResumeScalarFieldEnum = {
 } as const
 
 export type ResumeScalarFieldEnum = (typeof ResumeScalarFieldEnum)[keyof typeof ResumeScalarFieldEnum]
+
+
+export const ResumeJobMatchScalarFieldEnum = {
+  id: 'id',
+  matchScore: 'matchScore',
+  resumeSkills: 'resumeSkills',
+  jobSkills: 'jobSkills',
+  matchingSkills: 'matchingSkills',
+  missingSkills: 'missingSkills',
+  additionalSkills: 'additionalSkills',
+  recommendations: 'recommendations',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  userId: 'userId',
+  resumeId: 'resumeId',
+  jobId: 'jobId'
+} as const
+
+export type ResumeJobMatchScalarFieldEnum = (typeof ResumeJobMatchScalarFieldEnum)[keyof typeof ResumeJobMatchScalarFieldEnum]
 
 
 export const SortOrder = {

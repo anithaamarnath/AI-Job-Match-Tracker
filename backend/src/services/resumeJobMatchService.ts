@@ -2,6 +2,7 @@ import { getResumeById } from "../repositories/resumeRepository.js";
 import { getJobById } from "../repositories/jobRepository.js";
 import { AppError } from "../utils/AppError.js";
 import { detectSkills } from "./resumeAnalyzerService.js";
+import { saveResumeJobMatch } from "../repositories/resumeJobMatchRepository.js";
 
 export interface ResumeJobMatchResult {
   matchScore: number;
@@ -12,6 +13,8 @@ export interface ResumeJobMatchResult {
   additionalSkills: string[];
   recommendations: string[];
 }
+
+
 
 export const calculateResumeJobMatch = async (
   userId: string,
@@ -86,13 +89,34 @@ export const calculateResumeJobMatch = async (
     );
   });
 
-  return {
-    matchScore,
-    resumeSkills,
-    jobSkills,
-    matchingSkills,
-    missingSkills,
-    additionalSkills,
-    recommendations,
-  };
+
+
+
+
+  const result: ResumeJobMatchResult = {
+  matchScore,
+  resumeSkills,
+  jobSkills,
+  matchingSkills,
+  missingSkills,
+  additionalSkills,
+  recommendations,
 };
+
+await saveResumeJobMatch({
+  userId,
+  resumeId,
+  jobId,
+  matchScore: result.matchScore,
+  resumeSkills: result.resumeSkills,
+  jobSkills: result.jobSkills,
+  matchingSkills: result.matchingSkills,
+  missingSkills: result.missingSkills,
+  additionalSkills: result.additionalSkills,
+  recommendations: result.recommendations,
+});
+
+return result;
+};
+
+

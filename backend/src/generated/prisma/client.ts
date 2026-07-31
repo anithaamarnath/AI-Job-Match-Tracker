@@ -61,3 +61,8 @@ export type JobMatch = Prisma.JobMatchModel
  * 
  */
 export type Resume = Prisma.ResumeModel
+/**
+ * Model ResumeJobMatch
+ * 
+ */
+export type ResumeJobMatch = Prisma.ResumeJobMatchModel
