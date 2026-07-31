@@ -77,16 +77,19 @@ model Resume {
 }
 
 model ResumeJobMatch {
-  id               String   @id @default(cuid())
-  matchScore       Int
+  id         String @id @default(cuid())
+  matchScore Int
+  confidence String @default("LOW")
+
   resumeSkills     String[] @default([])
   jobSkills        String[] @default([])
   matchingSkills   String[] @default([])
   missingSkills    String[] @default([])
   additionalSkills String[] @default([])
   recommendations  String[] @default([])
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)

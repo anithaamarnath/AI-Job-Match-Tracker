@@ -32,6 +32,18 @@ const skillDefinitions: SkillDefinition[] = [
     aliases: ["express", "express.js", "expressjs"],
   },
   {
+    name: "Java",
+    aliases: ["java"],
+  },
+  {
+    name: "Python",
+    aliases: ["python"],
+  },
+  {
+    name: "PHP",
+    aliases: ["php"],
+  },
+  {
     name: "PostgreSQL",
     aliases: ["postgresql", "postgres", "psql"],
   },
@@ -44,40 +56,103 @@ const skillDefinitions: SkillDefinition[] = [
     aliases: ["mongodb", "mongo db"],
   },
   {
+    name: "Prisma",
+    aliases: ["prisma", "prisma orm"],
+  },
+  {
     name: "AWS",
-    aliases: [
-      "aws",
-      "amazon web services",
-    ],
+    aliases: ["aws", "amazon web services"],
+  },
+  {
+    name: "Azure",
+    aliases: ["azure", "microsoft azure"],
   },
   {
     name: "Docker",
-    aliases: ["docker"],
+    aliases: ["docker", "containerization", "containers"],
+  },
+  {
+    name: "Kubernetes",
+    aliases: ["kubernetes", "k8s"],
+  },
+  {
+    name: "Linux",
+    aliases: ["linux", "unix"],
   },
   {
     name: "Git",
     aliases: ["git", "github", "gitlab"],
   },
   {
+    name: "GitHub Actions",
+    aliases: ["github actions"],
+  },
+  {
+    name: "CI/CD",
+    aliases: [
+      "ci/cd",
+      "ci cd",
+      "continuous integration",
+      "continuous delivery",
+      "continuous deployment",
+    ],
+  },
+  {
     name: "REST API",
     aliases: [
       "rest api",
-      "restful api",
       "rest apis",
+      "restful api",
+      "restful services",
     ],
   },
   {
-    name: "Prisma",
-    aliases: ["prisma", "prisma orm"],
+    name: "GraphQL",
+    aliases: ["graphql"],
+  },
+  {
+    name: "Microservices",
+    aliases: ["microservices", "microservice architecture"],
+  },
+  {
+    name: "Distributed Systems",
+    aliases: ["distributed systems", "distributed computing"],
+  },
+  {
+    name: "System Design",
+    aliases: ["system design", "software architecture"],
+  },
+  {
+    name: "Unit Testing",
+    aliases: ["unit testing", "unit tests", "jest", "vitest"],
+  },
+  {
+    name: "Integration Testing",
+    aliases: ["integration testing", "integration tests"],
+  },
+  {
+    name: "End-to-End Testing",
+    aliases: ["end-to-end testing", "e2e testing", "cypress", "playwright"],
+  },
+  {
+    name: "Redis",
+    aliases: ["redis", "caching"],
+  },
+  {
+    name: "Kafka",
+    aliases: ["kafka", "apache kafka", "event streaming"],
   },
   {
     name: "Salesforce",
-    aliases: [
-      "salesforce",
-      "apex",
-      "lightning web components",
-      "lwc",
-    ],
+    aliases: ["salesforce"],
+  },
+  {
+    name: "Apex",
+    aliases: ["apex"],
+  },
+  {
+    name: "Lightning Web Components",
+    aliases: ["lightning web components", "lwc"],
   },
 ];
 
@@ -89,13 +164,22 @@ const normalizeText = (text: string): string => {
     .trim();
 };
 
+const escapeRegex = (value: string): string => {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+};
+
 const containsAlias = (
   normalizedText: string,
   alias: string
 ): boolean => {
   const normalizedAlias = normalizeText(alias);
 
-  return normalizedText.includes(normalizedAlias);
+  const pattern = new RegExp(
+    `(^|\\s)${escapeRegex(normalizedAlias)}(?=\\s|$|[.,;:/()+#-])`,
+    "i"
+  );
+
+  return pattern.test(normalizedText);
 };
 
 export const detectSkills = (

@@ -5,6 +5,7 @@ export interface CreateResumeJobMatchData {
   resumeId: string;
   jobId: string;
   matchScore: number;
+  confidence: "LOW" | "MEDIUM" | "HIGH";
   resumeSkills: string[];
   jobSkills: string[];
   matchingSkills: string[];
@@ -28,13 +29,33 @@ export const getResumeJobMatches = async (
     where: {
       userId,
     },
-    include: {
+
+    select: {
+      id: true,
+      matchScore: true,
+      confidence: true,
+
+      resumeSkills: true,
+      jobSkills: true,
+      matchingSkills: true,
+      missingSkills: true,
+      additionalSkills: true,
+      recommendations: true,
+
+      createdAt: true,
+      updatedAt: true,
+
+      userId: true,
+      resumeId: true,
+      jobId: true,
+
       resume: {
         select: {
           id: true,
           originalName: true,
         },
       },
+
       job: {
         select: {
           id: true,
@@ -43,6 +64,7 @@ export const getResumeJobMatches = async (
         },
       },
     },
+
     orderBy: {
       createdAt: "desc",
     },
@@ -58,13 +80,33 @@ export const getResumeJobMatchById = async (
       id: matchId,
       userId,
     },
-    include: {
+
+    select: {
+      id: true,
+      matchScore: true,
+      confidence: true,
+
+      resumeSkills: true,
+      jobSkills: true,
+      matchingSkills: true,
+      missingSkills: true,
+      additionalSkills: true,
+      recommendations: true,
+
+      createdAt: true,
+      updatedAt: true,
+
+      userId: true,
+      resumeId: true,
+      jobId: true,
+
       resume: {
         select: {
           id: true,
           originalName: true,
         },
       },
+
       job: {
         select: {
           id: true,

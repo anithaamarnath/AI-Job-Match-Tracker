@@ -37,6 +37,7 @@ export type ResumeJobMatchSumAggregateOutputType = {
 export type ResumeJobMatchMinAggregateOutputType = {
   id: string | null
   matchScore: number | null
+  confidence: string | null
   createdAt: Date | null
   updatedAt: Date | null
   userId: string | null
@@ -47,6 +48,7 @@ export type ResumeJobMatchMinAggregateOutputType = {
 export type ResumeJobMatchMaxAggregateOutputType = {
   id: string | null
   matchScore: number | null
+  confidence: string | null
   createdAt: Date | null
   updatedAt: Date | null
   userId: string | null
@@ -57,6 +59,7 @@ export type ResumeJobMatchMaxAggregateOutputType = {
 export type ResumeJobMatchCountAggregateOutputType = {
   id: number
   matchScore: number
+  confidence: number
   resumeSkills: number
   jobSkills: number
   matchingSkills: number
@@ -83,6 +86,7 @@ export type ResumeJobMatchSumAggregateInputType = {
 export type ResumeJobMatchMinAggregateInputType = {
   id?: true
   matchScore?: true
+  confidence?: true
   createdAt?: true
   updatedAt?: true
   userId?: true
@@ -93,6 +97,7 @@ export type ResumeJobMatchMinAggregateInputType = {
 export type ResumeJobMatchMaxAggregateInputType = {
   id?: true
   matchScore?: true
+  confidence?: true
   createdAt?: true
   updatedAt?: true
   userId?: true
@@ -103,6 +108,7 @@ export type ResumeJobMatchMaxAggregateInputType = {
 export type ResumeJobMatchCountAggregateInputType = {
   id?: true
   matchScore?: true
+  confidence?: true
   resumeSkills?: true
   jobSkills?: true
   matchingSkills?: true
@@ -206,6 +212,7 @@ export type ResumeJobMatchGroupByArgs<ExtArgs extends runtime.Types.Extensions.I
 export type ResumeJobMatchGroupByOutputType = {
   id: string
   matchScore: number
+  confidence: string
   resumeSkills: string[]
   jobSkills: string[]
   matchingSkills: string[]
@@ -245,6 +252,7 @@ export type ResumeJobMatchWhereInput = {
   NOT?: Prisma.ResumeJobMatchWhereInput | Prisma.ResumeJobMatchWhereInput[]
   id?: Prisma.StringFilter<"ResumeJobMatch"> | string
   matchScore?: Prisma.IntFilter<"ResumeJobMatch"> | number
+  confidence?: Prisma.StringFilter<"ResumeJobMatch"> | string
   resumeSkills?: Prisma.StringNullableListFilter<"ResumeJobMatch">
   jobSkills?: Prisma.StringNullableListFilter<"ResumeJobMatch">
   matchingSkills?: Prisma.StringNullableListFilter<"ResumeJobMatch">
@@ -264,6 +272,7 @@ export type ResumeJobMatchWhereInput = {
 export type ResumeJobMatchOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   matchScore?: Prisma.SortOrder
+  confidence?: Prisma.SortOrder
   resumeSkills?: Prisma.SortOrder
   jobSkills?: Prisma.SortOrder
   matchingSkills?: Prisma.SortOrder
@@ -286,6 +295,7 @@ export type ResumeJobMatchWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.ResumeJobMatchWhereInput[]
   NOT?: Prisma.ResumeJobMatchWhereInput | Prisma.ResumeJobMatchWhereInput[]
   matchScore?: Prisma.IntFilter<"ResumeJobMatch"> | number
+  confidence?: Prisma.StringFilter<"ResumeJobMatch"> | string
   resumeSkills?: Prisma.StringNullableListFilter<"ResumeJobMatch">
   jobSkills?: Prisma.StringNullableListFilter<"ResumeJobMatch">
   matchingSkills?: Prisma.StringNullableListFilter<"ResumeJobMatch">
@@ -305,6 +315,7 @@ export type ResumeJobMatchWhereUniqueInput = Prisma.AtLeast<{
 export type ResumeJobMatchOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   matchScore?: Prisma.SortOrder
+  confidence?: Prisma.SortOrder
   resumeSkills?: Prisma.SortOrder
   jobSkills?: Prisma.SortOrder
   matchingSkills?: Prisma.SortOrder
@@ -329,6 +340,7 @@ export type ResumeJobMatchScalarWhereWithAggregatesInput = {
   NOT?: Prisma.ResumeJobMatchScalarWhereWithAggregatesInput | Prisma.ResumeJobMatchScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"ResumeJobMatch"> | string
   matchScore?: Prisma.IntWithAggregatesFilter<"ResumeJobMatch"> | number
+  confidence?: Prisma.StringWithAggregatesFilter<"ResumeJobMatch"> | string
   resumeSkills?: Prisma.StringNullableListFilter<"ResumeJobMatch">
   jobSkills?: Prisma.StringNullableListFilter<"ResumeJobMatch">
   matchingSkills?: Prisma.StringNullableListFilter<"ResumeJobMatch">
@@ -345,6 +357,7 @@ export type ResumeJobMatchScalarWhereWithAggregatesInput = {
 export type ResumeJobMatchCreateInput = {
   id?: string
   matchScore: number
+  confidence?: string
   resumeSkills?: Prisma.ResumeJobMatchCreateresumeSkillsInput | string[]
   jobSkills?: Prisma.ResumeJobMatchCreatejobSkillsInput | string[]
   matchingSkills?: Prisma.ResumeJobMatchCreatematchingSkillsInput | string[]
@@ -361,6 +374,7 @@ export type ResumeJobMatchCreateInput = {
 export type ResumeJobMatchUncheckedCreateInput = {
   id?: string
   matchScore: number
+  confidence?: string
   resumeSkills?: Prisma.ResumeJobMatchCreateresumeSkillsInput | string[]
   jobSkills?: Prisma.ResumeJobMatchCreatejobSkillsInput | string[]
   matchingSkills?: Prisma.ResumeJobMatchCreatematchingSkillsInput | string[]
@@ -377,6 +391,7 @@ export type ResumeJobMatchUncheckedCreateInput = {
 export type ResumeJobMatchUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   matchScore?: Prisma.IntFieldUpdateOperationsInput | number
+  confidence?: Prisma.StringFieldUpdateOperationsInput | string
   resumeSkills?: Prisma.ResumeJobMatchUpdateresumeSkillsInput | string[]
   jobSkills?: Prisma.ResumeJobMatchUpdatejobSkillsInput | string[]
   matchingSkills?: Prisma.ResumeJobMatchUpdatematchingSkillsInput | string[]
@@ -393,6 +408,7 @@ export type ResumeJobMatchUpdateInput = {
 export type ResumeJobMatchUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   matchScore?: Prisma.IntFieldUpdateOperationsInput | number
+  confidence?: Prisma.StringFieldUpdateOperationsInput | string
   resumeSkills?: Prisma.ResumeJobMatchUpdateresumeSkillsInput | string[]
   jobSkills?: Prisma.ResumeJobMatchUpdatejobSkillsInput | string[]
   matchingSkills?: Prisma.ResumeJobMatchUpdatematchingSkillsInput | string[]
@@ -409,6 +425,7 @@ export type ResumeJobMatchUncheckedUpdateInput = {
 export type ResumeJobMatchCreateManyInput = {
   id?: string
   matchScore: number
+  confidence?: string
   resumeSkills?: Prisma.ResumeJobMatchCreateresumeSkillsInput | string[]
   jobSkills?: Prisma.ResumeJobMatchCreatejobSkillsInput | string[]
   matchingSkills?: Prisma.ResumeJobMatchCreatematchingSkillsInput | string[]
@@ -425,6 +442,7 @@ export type ResumeJobMatchCreateManyInput = {
 export type ResumeJobMatchUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   matchScore?: Prisma.IntFieldUpdateOperationsInput | number
+  confidence?: Prisma.StringFieldUpdateOperationsInput | string
   resumeSkills?: Prisma.ResumeJobMatchUpdateresumeSkillsInput | string[]
   jobSkills?: Prisma.ResumeJobMatchUpdatejobSkillsInput | string[]
   matchingSkills?: Prisma.ResumeJobMatchUpdatematchingSkillsInput | string[]
@@ -438,6 +456,7 @@ export type ResumeJobMatchUpdateManyMutationInput = {
 export type ResumeJobMatchUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   matchScore?: Prisma.IntFieldUpdateOperationsInput | number
+  confidence?: Prisma.StringFieldUpdateOperationsInput | string
   resumeSkills?: Prisma.ResumeJobMatchUpdateresumeSkillsInput | string[]
   jobSkills?: Prisma.ResumeJobMatchUpdatejobSkillsInput | string[]
   matchingSkills?: Prisma.ResumeJobMatchUpdatematchingSkillsInput | string[]
@@ -464,6 +483,7 @@ export type ResumeJobMatchOrderByRelationAggregateInput = {
 export type ResumeJobMatchCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   matchScore?: Prisma.SortOrder
+  confidence?: Prisma.SortOrder
   resumeSkills?: Prisma.SortOrder
   jobSkills?: Prisma.SortOrder
   matchingSkills?: Prisma.SortOrder
@@ -484,6 +504,7 @@ export type ResumeJobMatchAvgOrderByAggregateInput = {
 export type ResumeJobMatchMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   matchScore?: Prisma.SortOrder
+  confidence?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
@@ -494,6 +515,7 @@ export type ResumeJobMatchMaxOrderByAggregateInput = {
 export type ResumeJobMatchMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   matchScore?: Prisma.SortOrder
+  confidence?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
@@ -688,6 +710,7 @@ export type ResumeJobMatchUpdaterecommendationsInput = {
 export type ResumeJobMatchCreateWithoutUserInput = {
   id?: string
   matchScore: number
+  confidence?: string
   resumeSkills?: Prisma.ResumeJobMatchCreateresumeSkillsInput | string[]
   jobSkills?: Prisma.ResumeJobMatchCreatejobSkillsInput | string[]
   matchingSkills?: Prisma.ResumeJobMatchCreatematchingSkillsInput | string[]
@@ -703,6 +726,7 @@ export type ResumeJobMatchCreateWithoutUserInput = {
 export type ResumeJobMatchUncheckedCreateWithoutUserInput = {
   id?: string
   matchScore: number
+  confidence?: string
   resumeSkills?: Prisma.ResumeJobMatchCreateresumeSkillsInput | string[]
   jobSkills?: Prisma.ResumeJobMatchCreatejobSkillsInput | string[]
   matchingSkills?: Prisma.ResumeJobMatchCreatematchingSkillsInput | string[]
@@ -747,6 +771,7 @@ export type ResumeJobMatchScalarWhereInput = {
   NOT?: Prisma.ResumeJobMatchScalarWhereInput | Prisma.ResumeJobMatchScalarWhereInput[]
   id?: Prisma.StringFilter<"ResumeJobMatch"> | string
   matchScore?: Prisma.IntFilter<"ResumeJobMatch"> | number
+  confidence?: Prisma.StringFilter<"ResumeJobMatch"> | string
   resumeSkills?: Prisma.StringNullableListFilter<"ResumeJobMatch">
   jobSkills?: Prisma.StringNullableListFilter<"ResumeJobMatch">
   matchingSkills?: Prisma.StringNullableListFilter<"ResumeJobMatch">
@@ -763,6 +788,7 @@ export type ResumeJobMatchScalarWhereInput = {
 export type ResumeJobMatchCreateWithoutJobInput = {
   id?: string
   matchScore: number
+  confidence?: string
   resumeSkills?: Prisma.ResumeJobMatchCreateresumeSkillsInput | string[]
   jobSkills?: Prisma.ResumeJobMatchCreatejobSkillsInput | string[]
   matchingSkills?: Prisma.ResumeJobMatchCreatematchingSkillsInput | string[]
@@ -778,6 +804,7 @@ export type ResumeJobMatchCreateWithoutJobInput = {
 export type ResumeJobMatchUncheckedCreateWithoutJobInput = {
   id?: string
   matchScore: number
+  confidence?: string
   resumeSkills?: Prisma.ResumeJobMatchCreateresumeSkillsInput | string[]
   jobSkills?: Prisma.ResumeJobMatchCreatejobSkillsInput | string[]
   matchingSkills?: Prisma.ResumeJobMatchCreatematchingSkillsInput | string[]
@@ -819,6 +846,7 @@ export type ResumeJobMatchUpdateManyWithWhereWithoutJobInput = {
 export type ResumeJobMatchCreateWithoutResumeInput = {
   id?: string
   matchScore: number
+  confidence?: string
   resumeSkills?: Prisma.ResumeJobMatchCreateresumeSkillsInput | string[]
   jobSkills?: Prisma.ResumeJobMatchCreatejobSkillsInput | string[]
   matchingSkills?: Prisma.ResumeJobMatchCreatematchingSkillsInput | string[]
@@ -834,6 +862,7 @@ export type ResumeJobMatchCreateWithoutResumeInput = {
 export type ResumeJobMatchUncheckedCreateWithoutResumeInput = {
   id?: string
   matchScore: number
+  confidence?: string
   resumeSkills?: Prisma.ResumeJobMatchCreateresumeSkillsInput | string[]
   jobSkills?: Prisma.ResumeJobMatchCreatejobSkillsInput | string[]
   matchingSkills?: Prisma.ResumeJobMatchCreatematchingSkillsInput | string[]
@@ -875,6 +904,7 @@ export type ResumeJobMatchUpdateManyWithWhereWithoutResumeInput = {
 export type ResumeJobMatchCreateManyUserInput = {
   id?: string
   matchScore: number
+  confidence?: string
   resumeSkills?: Prisma.ResumeJobMatchCreateresumeSkillsInput | string[]
   jobSkills?: Prisma.ResumeJobMatchCreatejobSkillsInput | string[]
   matchingSkills?: Prisma.ResumeJobMatchCreatematchingSkillsInput | string[]
@@ -890,6 +920,7 @@ export type ResumeJobMatchCreateManyUserInput = {
 export type ResumeJobMatchUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   matchScore?: Prisma.IntFieldUpdateOperationsInput | number
+  confidence?: Prisma.StringFieldUpdateOperationsInput | string
   resumeSkills?: Prisma.ResumeJobMatchUpdateresumeSkillsInput | string[]
   jobSkills?: Prisma.ResumeJobMatchUpdatejobSkillsInput | string[]
   matchingSkills?: Prisma.ResumeJobMatchUpdatematchingSkillsInput | string[]
@@ -905,6 +936,7 @@ export type ResumeJobMatchUpdateWithoutUserInput = {
 export type ResumeJobMatchUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   matchScore?: Prisma.IntFieldUpdateOperationsInput | number
+  confidence?: Prisma.StringFieldUpdateOperationsInput | string
   resumeSkills?: Prisma.ResumeJobMatchUpdateresumeSkillsInput | string[]
   jobSkills?: Prisma.ResumeJobMatchUpdatejobSkillsInput | string[]
   matchingSkills?: Prisma.ResumeJobMatchUpdatematchingSkillsInput | string[]
@@ -920,6 +952,7 @@ export type ResumeJobMatchUncheckedUpdateWithoutUserInput = {
 export type ResumeJobMatchUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   matchScore?: Prisma.IntFieldUpdateOperationsInput | number
+  confidence?: Prisma.StringFieldUpdateOperationsInput | string
   resumeSkills?: Prisma.ResumeJobMatchUpdateresumeSkillsInput | string[]
   jobSkills?: Prisma.ResumeJobMatchUpdatejobSkillsInput | string[]
   matchingSkills?: Prisma.ResumeJobMatchUpdatematchingSkillsInput | string[]
@@ -935,6 +968,7 @@ export type ResumeJobMatchUncheckedUpdateManyWithoutUserInput = {
 export type ResumeJobMatchCreateManyJobInput = {
   id?: string
   matchScore: number
+  confidence?: string
   resumeSkills?: Prisma.ResumeJobMatchCreateresumeSkillsInput | string[]
   jobSkills?: Prisma.ResumeJobMatchCreatejobSkillsInput | string[]
   matchingSkills?: Prisma.ResumeJobMatchCreatematchingSkillsInput | string[]
@@ -950,6 +984,7 @@ export type ResumeJobMatchCreateManyJobInput = {
 export type ResumeJobMatchUpdateWithoutJobInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   matchScore?: Prisma.IntFieldUpdateOperationsInput | number
+  confidence?: Prisma.StringFieldUpdateOperationsInput | string
   resumeSkills?: Prisma.ResumeJobMatchUpdateresumeSkillsInput | string[]
   jobSkills?: Prisma.ResumeJobMatchUpdatejobSkillsInput | string[]
   matchingSkills?: Prisma.ResumeJobMatchUpdatematchingSkillsInput | string[]
@@ -965,6 +1000,7 @@ export type ResumeJobMatchUpdateWithoutJobInput = {
 export type ResumeJobMatchUncheckedUpdateWithoutJobInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   matchScore?: Prisma.IntFieldUpdateOperationsInput | number
+  confidence?: Prisma.StringFieldUpdateOperationsInput | string
   resumeSkills?: Prisma.ResumeJobMatchUpdateresumeSkillsInput | string[]
   jobSkills?: Prisma.ResumeJobMatchUpdatejobSkillsInput | string[]
   matchingSkills?: Prisma.ResumeJobMatchUpdatematchingSkillsInput | string[]
@@ -980,6 +1016,7 @@ export type ResumeJobMatchUncheckedUpdateWithoutJobInput = {
 export type ResumeJobMatchUncheckedUpdateManyWithoutJobInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   matchScore?: Prisma.IntFieldUpdateOperationsInput | number
+  confidence?: Prisma.StringFieldUpdateOperationsInput | string
   resumeSkills?: Prisma.ResumeJobMatchUpdateresumeSkillsInput | string[]
   jobSkills?: Prisma.ResumeJobMatchUpdatejobSkillsInput | string[]
   matchingSkills?: Prisma.ResumeJobMatchUpdatematchingSkillsInput | string[]
@@ -995,6 +1032,7 @@ export type ResumeJobMatchUncheckedUpdateManyWithoutJobInput = {
 export type ResumeJobMatchCreateManyResumeInput = {
   id?: string
   matchScore: number
+  confidence?: string
   resumeSkills?: Prisma.ResumeJobMatchCreateresumeSkillsInput | string[]
   jobSkills?: Prisma.ResumeJobMatchCreatejobSkillsInput | string[]
   matchingSkills?: Prisma.ResumeJobMatchCreatematchingSkillsInput | string[]
@@ -1010,6 +1048,7 @@ export type ResumeJobMatchCreateManyResumeInput = {
 export type ResumeJobMatchUpdateWithoutResumeInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   matchScore?: Prisma.IntFieldUpdateOperationsInput | number
+  confidence?: Prisma.StringFieldUpdateOperationsInput | string
   resumeSkills?: Prisma.ResumeJobMatchUpdateresumeSkillsInput | string[]
   jobSkills?: Prisma.ResumeJobMatchUpdatejobSkillsInput | string[]
   matchingSkills?: Prisma.ResumeJobMatchUpdatematchingSkillsInput | string[]
@@ -1025,6 +1064,7 @@ export type ResumeJobMatchUpdateWithoutResumeInput = {
 export type ResumeJobMatchUncheckedUpdateWithoutResumeInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   matchScore?: Prisma.IntFieldUpdateOperationsInput | number
+  confidence?: Prisma.StringFieldUpdateOperationsInput | string
   resumeSkills?: Prisma.ResumeJobMatchUpdateresumeSkillsInput | string[]
   jobSkills?: Prisma.ResumeJobMatchUpdatejobSkillsInput | string[]
   matchingSkills?: Prisma.ResumeJobMatchUpdatematchingSkillsInput | string[]
@@ -1040,6 +1080,7 @@ export type ResumeJobMatchUncheckedUpdateWithoutResumeInput = {
 export type ResumeJobMatchUncheckedUpdateManyWithoutResumeInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   matchScore?: Prisma.IntFieldUpdateOperationsInput | number
+  confidence?: Prisma.StringFieldUpdateOperationsInput | string
   resumeSkills?: Prisma.ResumeJobMatchUpdateresumeSkillsInput | string[]
   jobSkills?: Prisma.ResumeJobMatchUpdatejobSkillsInput | string[]
   matchingSkills?: Prisma.ResumeJobMatchUpdatematchingSkillsInput | string[]
@@ -1057,6 +1098,7 @@ export type ResumeJobMatchUncheckedUpdateManyWithoutResumeInput = {
 export type ResumeJobMatchSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   matchScore?: boolean
+  confidence?: boolean
   resumeSkills?: boolean
   jobSkills?: boolean
   matchingSkills?: boolean
@@ -1076,6 +1118,7 @@ export type ResumeJobMatchSelect<ExtArgs extends runtime.Types.Extensions.Intern
 export type ResumeJobMatchSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   matchScore?: boolean
+  confidence?: boolean
   resumeSkills?: boolean
   jobSkills?: boolean
   matchingSkills?: boolean
@@ -1095,6 +1138,7 @@ export type ResumeJobMatchSelectCreateManyAndReturn<ExtArgs extends runtime.Type
 export type ResumeJobMatchSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   matchScore?: boolean
+  confidence?: boolean
   resumeSkills?: boolean
   jobSkills?: boolean
   matchingSkills?: boolean
@@ -1114,6 +1158,7 @@ export type ResumeJobMatchSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
 export type ResumeJobMatchSelectScalar = {
   id?: boolean
   matchScore?: boolean
+  confidence?: boolean
   resumeSkills?: boolean
   jobSkills?: boolean
   matchingSkills?: boolean
@@ -1127,7 +1172,7 @@ export type ResumeJobMatchSelectScalar = {
   jobId?: boolean
 }
 
-export type ResumeJobMatchOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "matchScore" | "resumeSkills" | "jobSkills" | "matchingSkills" | "missingSkills" | "additionalSkills" | "recommendations" | "createdAt" | "updatedAt" | "userId" | "resumeId" | "jobId", ExtArgs["result"]["resumeJobMatch"]>
+export type ResumeJobMatchOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "matchScore" | "confidence" | "resumeSkills" | "jobSkills" | "matchingSkills" | "missingSkills" | "additionalSkills" | "recommendations" | "createdAt" | "updatedAt" | "userId" | "resumeId" | "jobId", ExtArgs["result"]["resumeJobMatch"]>
 export type ResumeJobMatchInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   resume?: boolean | Prisma.ResumeDefaultArgs<ExtArgs>
@@ -1154,6 +1199,7 @@ export type $ResumeJobMatchPayload<ExtArgs extends runtime.Types.Extensions.Inte
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     matchScore: number
+    confidence: string
     resumeSkills: string[]
     jobSkills: string[]
     matchingSkills: string[]
@@ -1593,6 +1639,7 @@ export interface Prisma__ResumeJobMatchClient<T, Null = never, ExtArgs extends r
 export interface ResumeJobMatchFieldRefs {
   readonly id: Prisma.FieldRef<"ResumeJobMatch", 'String'>
   readonly matchScore: Prisma.FieldRef<"ResumeJobMatch", 'Int'>
+  readonly confidence: Prisma.FieldRef<"ResumeJobMatch", 'String'>
   readonly resumeSkills: Prisma.FieldRef<"ResumeJobMatch", 'String[]'>
   readonly jobSkills: Prisma.FieldRef<"ResumeJobMatch", 'String[]'>
   readonly matchingSkills: Prisma.FieldRef<"ResumeJobMatch", 'String[]'>

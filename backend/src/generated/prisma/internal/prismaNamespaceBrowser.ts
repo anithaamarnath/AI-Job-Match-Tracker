@@ -138,6 +138,7 @@ export type ResumeScalarFieldEnum = (typeof ResumeScalarFieldEnum)[keyof typeof 
 export const ResumeJobMatchScalarFieldEnum = {
   id: 'id',
   matchScore: 'matchScore',
+  confidence: 'confidence',
   resumeSkills: 'resumeSkills',
   jobSkills: 'jobSkills',
   matchingSkills: 'matchingSkills',

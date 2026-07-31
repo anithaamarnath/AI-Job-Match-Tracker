@@ -1,16 +1,21 @@
 import { getResumeById } from "../repositories/resumeRepository.js";
 import { getJobById } from "../repositories/jobRepository.js";
-import { AppError } from "../utils/AppError.js";
-import { detectSkills } from "./resumeAnalyzerService.js";
-import { 
+
+import {
   deleteResumeJobMatchById,
   getResumeJobMatchById,
   getResumeJobMatches,
-  saveResumeJobMatch 
+  saveResumeJobMatch,
 } from "../repositories/resumeJobMatchRepository.js";
+
+import { AppError } from "../utils/AppError.js";
+import { detectSkills } from "./resumeAnalyzerService.js";
+
+export type MatchConfidence = "LOW" | "MEDIUM" | "HIGH";
 
 export interface ResumeJobMatchResult {
   matchScore: number;
+  confidence: MatchConfidence;
   resumeSkills: string[];
   jobSkills: string[];
   matchingSkills: string[];
@@ -19,56 +24,41 @@ export interface ResumeJobMatchResult {
   recommendations: string[];
 }
 
-
-
-export const calculateResumeJobMatch = async (
-  userId: string,
-  resumeId: string,
-  jobId: string
-): Promise<ResumeJobMatchResult> => {
-  // Get resume
-  const resume = await getResumeById(userId, resumeId);
-
-  if (!resume) {
-    throw new AppError("Resume not found", 404);
+const calculateConfidence = (
+  detectedJobSkillCount: number
+): MatchConfidence => {
+  if (detectedJobSkillCount >= 8) {
+    return "HIGH";
   }
 
-  // Get job
-  const job = await getJobById(userId, jobId);
-
-  if (!job) {
-    throw new AppError("Job not found", 404);
+  if (detectedJobSkillCount >= 4) {
+    return "MEDIUM";
   }
 
-  // Detect skills
-  const resumeSkills = detectSkills(resume.extractedText);
-  const jobSkills = detectSkills(job.description);
+  return "LOW";
+};
 
-  // Skills that exist in both
-  const matchingSkills = jobSkills.filter((skill) =>
-    resumeSkills.includes(skill)
-  );
-
-  // Skills required by the job but missing from resume
-  const missingSkills = jobSkills.filter(
-    (skill) => !resumeSkills.includes(skill)
-  );
-
-  // Skills on the resume that aren't mentioned in the job
-  const additionalSkills = resumeSkills.filter(
-    (skill) => !jobSkills.includes(skill)
-  );
-
-  // Match score
-  const matchScore =
-    jobSkills.length === 0
-      ? 0
-      : Math.round(
-          (matchingSkills.length / jobSkills.length) * 100
-        );
-
-  // Recommendations
+const createRecommendations = (
+  matchScore: number,
+  confidence: MatchConfidence,
+  jobSkills: string[],
+  missingSkills: string[]
+): string[] => {
   const recommendations: string[] = [];
+
+  if (confidence === "LOW") {
+    recommendations.push(
+      "The score has low confidence because only a few recognized skills were found in the job description."
+    );
+  }
+
+  if (jobSkills.length === 0) {
+    recommendations.push(
+      "The job description does not contain enough recognizable technical skills."
+    );
+
+    return recommendations;
+  }
 
   if (matchScore >= 90) {
     recommendations.push(
@@ -88,42 +78,96 @@ export const calculateResumeJobMatch = async (
     );
   }
 
-  missingSkills.forEach((skill) => {
+  for (const skill of missingSkills) {
     recommendations.push(
       `Consider adding projects or experience related to ${skill}.`
     );
-  });
+  }
 
-  
-
-
-
-
-
-  const result: ResumeJobMatchResult = {
-  matchScore,
-  resumeSkills,
-  jobSkills,
-  matchingSkills,
-  missingSkills,
-  additionalSkills,
-  recommendations,
+  return recommendations;
 };
 
-await saveResumeJobMatch({
-  userId,
-  resumeId,
-  jobId,
-  matchScore: result.matchScore,
-  resumeSkills: result.resumeSkills,
-  jobSkills: result.jobSkills,
-  matchingSkills: result.matchingSkills,
-  missingSkills: result.missingSkills,
-  additionalSkills: result.additionalSkills,
-  recommendations: result.recommendations,
-});
+export const calculateResumeJobMatch = async (
+  userId: string,
+  resumeId: string,
+  jobId: string
+): Promise<ResumeJobMatchResult> => {
+  const resume = await getResumeById(userId, resumeId);
 
-return result;
+  if (!resume) {
+    throw new AppError("Resume not found", 404);
+  }
+
+  const job = await getJobById(userId, jobId);
+
+  if (!job) {
+    throw new AppError("Job not found", 404);
+  }
+
+  const resumeSkills = detectSkills(
+    resume.extractedText
+  );
+
+  const jobSkills = detectSkills(
+    job.description
+  );
+
+  const matchingSkills = jobSkills.filter(
+    (skill) => resumeSkills.includes(skill)
+  );
+
+  const missingSkills = jobSkills.filter(
+    (skill) => !resumeSkills.includes(skill)
+  );
+
+  const additionalSkills = resumeSkills.filter(
+    (skill) => !jobSkills.includes(skill)
+  );
+
+  const matchScore =
+    jobSkills.length === 0
+      ? 0
+      : Math.round(
+          (matchingSkills.length / jobSkills.length) * 100
+        );
+
+  const confidence = calculateConfidence(
+    jobSkills.length
+  );
+
+  const recommendations = createRecommendations(
+    matchScore,
+    confidence,
+    jobSkills,
+    missingSkills
+  );
+
+  const result: ResumeJobMatchResult = {
+    matchScore,
+    confidence,
+    resumeSkills,
+    jobSkills,
+    matchingSkills,
+    missingSkills,
+    additionalSkills,
+    recommendations,
+  };
+
+  await saveResumeJobMatch({
+    userId,
+    resumeId,
+    jobId,
+    matchScore: result.matchScore,
+    confidence: result.confidence,
+    resumeSkills: result.resumeSkills,
+    jobSkills: result.jobSkills,
+    matchingSkills: result.matchingSkills,
+    missingSkills: result.missingSkills,
+    additionalSkills: result.additionalSkills,
+    recommendations: result.recommendations,
+  });
+
+  return result;
 };
 
 export const getResumeJobMatchHistory = async (
@@ -154,7 +198,7 @@ export const getResumeJobMatchHistoryById = async (
 export const deleteResumeJobMatchHistoryById = async (
   userId: string,
   matchId: string
-) => {
+): Promise<void> => {
   const result = await deleteResumeJobMatchById(
     userId,
     matchId
@@ -167,5 +211,3 @@ export const deleteResumeJobMatchHistoryById = async (
     );
   }
 };
-
-
