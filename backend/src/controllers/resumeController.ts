@@ -4,11 +4,14 @@ import type {
   Response,
 } from "express";
 import {
+  analyzeSavedResume,
   deleteResumeHistoryById,
   getResumeHistory,
   getResumeHistoryById,
   saveUploadedResume,
 } from "../services/resumeService.js";
+
+
 
 import { AppError } from "../utils/AppError.js";
 
@@ -131,6 +134,44 @@ export const deleteResume = async (
     res.status(200).json({
       success: true,
       message: "Resume deleted successfully",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const analyzeResume = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const userId = req.user?.id;
+    const resumeId = req.params.id;
+
+    if (!userId) {
+      throw new AppError(
+        "User is not authenticated",
+        401
+      );
+    }
+
+    if (!resumeId) {
+      throw new AppError(
+        "Resume ID is required",
+        400
+      );
+    }
+
+    const analysis = await analyzeSavedResume(
+      userId,
+      resumeId
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Resume analyzed successfully",
+      data: analysis,
     });
   } catch (error) {
     next(error);

@@ -7,6 +7,9 @@ import {
   getResumeById,
   getResumesByUserId,
 } from "../repositories/resumeRepository.js";
+import {
+  analyzeResumeText,
+} from "./resumeAnalyzerService.js";
 
 import { AppError } from "../utils/AppError.js";
 
@@ -99,4 +102,28 @@ export const deleteResumeHistoryById = async (
   }
 
   return deleteResumeById(userId, resumeId);
+};
+
+export const analyzeSavedResume = async (
+  userId: string,
+  resumeId: string
+) => {
+  const resume = await getResumeById(
+    userId,
+    resumeId
+  );
+
+  if (!resume) {
+    throw new AppError("Resume not found", 404);
+  }
+
+  const analysis = analyzeResumeText(
+    resume.extractedText
+  );
+
+  return {
+    resumeId: resume.id,
+    originalName: resume.originalName,
+    ...analysis,
+  };
 };

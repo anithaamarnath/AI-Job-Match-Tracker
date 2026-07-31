@@ -1,6 +1,7 @@
 import { Router } from "express";
 
 import {
+  analyzeResume,
   deleteResume,
   getResume,
   getResumes,
@@ -22,6 +23,12 @@ router.get(
   "/",
   authenticate,
   getResumes
+);
+
+router.get(
+  "/:id/analysis",
+  authenticate,
+  analyzeResume
 );
 
 router.get(
