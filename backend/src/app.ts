@@ -8,6 +8,7 @@ import jobRoutes from "./routes/jobRoutes";
 import authRoutes from "./routes/authRoutes";
 import jobMatchRoutes from "./routes/jobMatchRoutes.js";
 import resumeRoutes from "./routes/resumeRoutes.js";
+import resumeJobMatchRoutes from "./routes/resumeJobMatchRoutes.js";
 
 const app = express();
 
@@ -20,7 +21,7 @@ app.use("/api/jobs", jobRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/match", jobMatchRoutes);
 app.use("/api/resume", resumeRoutes);
-
+app.use("/api/matches",resumeJobMatchRoutes);
 
 
 app.use(notFound);

@@ -98,15 +98,15 @@ const containsAlias = (
   return normalizedText.includes(normalizedAlias);
 };
 
-const detectSkills = (
+export const detectSkills = (
   resumeText: string
 ): string[] => {
-  const normalizedResume = normalizeText(resumeText);
+  const normalizedText = normalizeText(resumeText);
 
   return skillDefinitions
     .filter((skill) =>
       skill.aliases.some((alias) =>
-        containsAlias(normalizedResume, alias)
+        containsAlias(normalizedText, alias)
       )
     )
     .map((skill) => skill.name);
