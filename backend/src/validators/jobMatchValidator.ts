@@ -1,14 +1,10 @@
 import { z } from "zod";
 
 export const jobMatchSchema = z.object({
-  resume: z
-    .string()
-    .trim()
-    .min(50, "Resume must contain at least 50 characters"),
+  resumeId: z.string().min(1, "Resume ID is required"),
 
   jobDescription: z
     .string()
-    .trim()
     .min(50, "Job description must contain at least 50 characters"),
 });
 

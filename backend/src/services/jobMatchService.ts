@@ -5,6 +5,7 @@ import {
   deleteJobMatchById,
   getJobMatchesByUserId
  } from "../repositories/jobMatchRepository.js";
+ import { getResumeById } from "../repositories/resumeRepository.js";
 
 
  import { AppError } from "../utils/AppError.js";
@@ -163,13 +164,19 @@ export const analyzeJobMatch = async (
   userId: string,
   data: JobMatchInput
 ): Promise<JobMatchResult> => {
-  const resumeText = normalizeText(data.resume);
-  const jobDescriptionText = normalizeText(
-    data.jobDescription
+  const resume = await getResumeById(
+    userId,
+    data.resumeId
   );
 
+   if (!resume) {
+    throw new AppError("Resume not found", 404);
+  }
+  const resumeText = resume.extractedText;
+  const jobDescription = data.jobDescription;
+
   const requiredSkills = skills.filter((skill) =>
-    containsSkill(jobDescriptionText, skill.aliases)
+    containsSkill(jobDescription, skill.aliases)
   );
 
   const matchedSkills = requiredSkills
@@ -217,7 +224,7 @@ export const analyzeJobMatch = async (
 
   await createJobMatch({
     userId,
-    resume: data.resume,
+    resume: resumeText,
     jobDescription: data.jobDescription,
     matchScore: result.matchScore,
     matchedSkills: result.matchedSkills,
