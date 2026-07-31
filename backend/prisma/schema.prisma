@@ -52,13 +52,17 @@ model JobMatch {
 }
 
 model Resume {
-    id String @id @default(cuid())
-
-    originalName String
-    storedName   String
-    filePath     String
-
+    id            String @id @default(cuid())
+    originalName  String
+    storedName    String
+    filePath      String
     extractedText String @db.Text
+
+    atsScore        Int?
+    detectedSkills  String[]  @default([])
+    strengths       String[]  @default([])
+    recommendations String[]  @default([])
+    analyzedAt      DateTime?
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

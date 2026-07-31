@@ -20,8 +20,18 @@ export type ResumeModel = runtime.Types.Result.DefaultSelection<Prisma.$ResumePa
 
 export type AggregateResume = {
   _count: ResumeCountAggregateOutputType | null
+  _avg: ResumeAvgAggregateOutputType | null
+  _sum: ResumeSumAggregateOutputType | null
   _min: ResumeMinAggregateOutputType | null
   _max: ResumeMaxAggregateOutputType | null
+}
+
+export type ResumeAvgAggregateOutputType = {
+  atsScore: number | null
+}
+
+export type ResumeSumAggregateOutputType = {
+  atsScore: number | null
 }
 
 export type ResumeMinAggregateOutputType = {
@@ -30,6 +40,8 @@ export type ResumeMinAggregateOutputType = {
   storedName: string | null
   filePath: string | null
   extractedText: string | null
+  atsScore: number | null
+  analyzedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
   userId: string | null
@@ -41,6 +53,8 @@ export type ResumeMaxAggregateOutputType = {
   storedName: string | null
   filePath: string | null
   extractedText: string | null
+  atsScore: number | null
+  analyzedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
   userId: string | null
@@ -52,6 +66,11 @@ export type ResumeCountAggregateOutputType = {
   storedName: number
   filePath: number
   extractedText: number
+  atsScore: number
+  detectedSkills: number
+  strengths: number
+  recommendations: number
+  analyzedAt: number
   createdAt: number
   updatedAt: number
   userId: number
@@ -59,12 +78,22 @@ export type ResumeCountAggregateOutputType = {
 }
 
 
+export type ResumeAvgAggregateInputType = {
+  atsScore?: true
+}
+
+export type ResumeSumAggregateInputType = {
+  atsScore?: true
+}
+
 export type ResumeMinAggregateInputType = {
   id?: true
   originalName?: true
   storedName?: true
   filePath?: true
   extractedText?: true
+  atsScore?: true
+  analyzedAt?: true
   createdAt?: true
   updatedAt?: true
   userId?: true
@@ -76,6 +105,8 @@ export type ResumeMaxAggregateInputType = {
   storedName?: true
   filePath?: true
   extractedText?: true
+  atsScore?: true
+  analyzedAt?: true
   createdAt?: true
   updatedAt?: true
   userId?: true
@@ -87,6 +118,11 @@ export type ResumeCountAggregateInputType = {
   storedName?: true
   filePath?: true
   extractedText?: true
+  atsScore?: true
+  detectedSkills?: true
+  strengths?: true
+  recommendations?: true
+  analyzedAt?: true
   createdAt?: true
   updatedAt?: true
   userId?: true
@@ -131,6 +167,18 @@ export type ResumeAggregateArgs<ExtArgs extends runtime.Types.Extensions.Interna
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: ResumeAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: ResumeSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: ResumeMinAggregateInputType
@@ -161,6 +209,8 @@ export type ResumeGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   _count?: ResumeCountAggregateInputType | true
+  _avg?: ResumeAvgAggregateInputType
+  _sum?: ResumeSumAggregateInputType
   _min?: ResumeMinAggregateInputType
   _max?: ResumeMaxAggregateInputType
 }
@@ -171,10 +221,17 @@ export type ResumeGroupByOutputType = {
   storedName: string
   filePath: string
   extractedText: string
+  atsScore: number | null
+  detectedSkills: string[]
+  strengths: string[]
+  recommendations: string[]
+  analyzedAt: Date | null
   createdAt: Date
   updatedAt: Date
   userId: string
   _count: ResumeCountAggregateOutputType | null
+  _avg: ResumeAvgAggregateOutputType | null
+  _sum: ResumeSumAggregateOutputType | null
   _min: ResumeMinAggregateOutputType | null
   _max: ResumeMaxAggregateOutputType | null
 }
@@ -203,6 +260,11 @@ export type ResumeWhereInput = {
   storedName?: Prisma.StringFilter<"Resume"> | string
   filePath?: Prisma.StringFilter<"Resume"> | string
   extractedText?: Prisma.StringFilter<"Resume"> | string
+  atsScore?: Prisma.IntNullableFilter<"Resume"> | number | null
+  detectedSkills?: Prisma.StringNullableListFilter<"Resume">
+  strengths?: Prisma.StringNullableListFilter<"Resume">
+  recommendations?: Prisma.StringNullableListFilter<"Resume">
+  analyzedAt?: Prisma.DateTimeNullableFilter<"Resume"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Resume"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Resume"> | Date | string
   userId?: Prisma.StringFilter<"Resume"> | string
@@ -215,6 +277,11 @@ export type ResumeOrderByWithRelationInput = {
   storedName?: Prisma.SortOrder
   filePath?: Prisma.SortOrder
   extractedText?: Prisma.SortOrder
+  atsScore?: Prisma.SortOrderInput | Prisma.SortOrder
+  detectedSkills?: Prisma.SortOrder
+  strengths?: Prisma.SortOrder
+  recommendations?: Prisma.SortOrder
+  analyzedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
@@ -230,6 +297,11 @@ export type ResumeWhereUniqueInput = Prisma.AtLeast<{
   storedName?: Prisma.StringFilter<"Resume"> | string
   filePath?: Prisma.StringFilter<"Resume"> | string
   extractedText?: Prisma.StringFilter<"Resume"> | string
+  atsScore?: Prisma.IntNullableFilter<"Resume"> | number | null
+  detectedSkills?: Prisma.StringNullableListFilter<"Resume">
+  strengths?: Prisma.StringNullableListFilter<"Resume">
+  recommendations?: Prisma.StringNullableListFilter<"Resume">
+  analyzedAt?: Prisma.DateTimeNullableFilter<"Resume"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Resume"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Resume"> | Date | string
   userId?: Prisma.StringFilter<"Resume"> | string
@@ -242,12 +314,19 @@ export type ResumeOrderByWithAggregationInput = {
   storedName?: Prisma.SortOrder
   filePath?: Prisma.SortOrder
   extractedText?: Prisma.SortOrder
+  atsScore?: Prisma.SortOrderInput | Prisma.SortOrder
+  detectedSkills?: Prisma.SortOrder
+  strengths?: Prisma.SortOrder
+  recommendations?: Prisma.SortOrder
+  analyzedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   _count?: Prisma.ResumeCountOrderByAggregateInput
+  _avg?: Prisma.ResumeAvgOrderByAggregateInput
   _max?: Prisma.ResumeMaxOrderByAggregateInput
   _min?: Prisma.ResumeMinOrderByAggregateInput
+  _sum?: Prisma.ResumeSumOrderByAggregateInput
 }
 
 export type ResumeScalarWhereWithAggregatesInput = {
@@ -259,6 +338,11 @@ export type ResumeScalarWhereWithAggregatesInput = {
   storedName?: Prisma.StringWithAggregatesFilter<"Resume"> | string
   filePath?: Prisma.StringWithAggregatesFilter<"Resume"> | string
   extractedText?: Prisma.StringWithAggregatesFilter<"Resume"> | string
+  atsScore?: Prisma.IntNullableWithAggregatesFilter<"Resume"> | number | null
+  detectedSkills?: Prisma.StringNullableListFilter<"Resume">
+  strengths?: Prisma.StringNullableListFilter<"Resume">
+  recommendations?: Prisma.StringNullableListFilter<"Resume">
+  analyzedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Resume"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Resume"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Resume"> | Date | string
   userId?: Prisma.StringWithAggregatesFilter<"Resume"> | string
@@ -270,6 +354,11 @@ export type ResumeCreateInput = {
   storedName: string
   filePath: string
   extractedText: string
+  atsScore?: number | null
+  detectedSkills?: Prisma.ResumeCreatedetectedSkillsInput | string[]
+  strengths?: Prisma.ResumeCreatestrengthsInput | string[]
+  recommendations?: Prisma.ResumeCreaterecommendationsInput | string[]
+  analyzedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutResumesInput
@@ -281,6 +370,11 @@ export type ResumeUncheckedCreateInput = {
   storedName: string
   filePath: string
   extractedText: string
+  atsScore?: number | null
+  detectedSkills?: Prisma.ResumeCreatedetectedSkillsInput | string[]
+  strengths?: Prisma.ResumeCreatestrengthsInput | string[]
+  recommendations?: Prisma.ResumeCreaterecommendationsInput | string[]
+  analyzedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   userId: string
@@ -292,6 +386,11 @@ export type ResumeUpdateInput = {
   storedName?: Prisma.StringFieldUpdateOperationsInput | string
   filePath?: Prisma.StringFieldUpdateOperationsInput | string
   extractedText?: Prisma.StringFieldUpdateOperationsInput | string
+  atsScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  detectedSkills?: Prisma.ResumeUpdatedetectedSkillsInput | string[]
+  strengths?: Prisma.ResumeUpdatestrengthsInput | string[]
+  recommendations?: Prisma.ResumeUpdaterecommendationsInput | string[]
+  analyzedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutResumesNestedInput
@@ -303,6 +402,11 @@ export type ResumeUncheckedUpdateInput = {
   storedName?: Prisma.StringFieldUpdateOperationsInput | string
   filePath?: Prisma.StringFieldUpdateOperationsInput | string
   extractedText?: Prisma.StringFieldUpdateOperationsInput | string
+  atsScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  detectedSkills?: Prisma.ResumeUpdatedetectedSkillsInput | string[]
+  strengths?: Prisma.ResumeUpdatestrengthsInput | string[]
+  recommendations?: Prisma.ResumeUpdaterecommendationsInput | string[]
+  analyzedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -314,6 +418,11 @@ export type ResumeCreateManyInput = {
   storedName: string
   filePath: string
   extractedText: string
+  atsScore?: number | null
+  detectedSkills?: Prisma.ResumeCreatedetectedSkillsInput | string[]
+  strengths?: Prisma.ResumeCreatestrengthsInput | string[]
+  recommendations?: Prisma.ResumeCreaterecommendationsInput | string[]
+  analyzedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   userId: string
@@ -325,6 +434,11 @@ export type ResumeUpdateManyMutationInput = {
   storedName?: Prisma.StringFieldUpdateOperationsInput | string
   filePath?: Prisma.StringFieldUpdateOperationsInput | string
   extractedText?: Prisma.StringFieldUpdateOperationsInput | string
+  atsScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  detectedSkills?: Prisma.ResumeUpdatedetectedSkillsInput | string[]
+  strengths?: Prisma.ResumeUpdatestrengthsInput | string[]
+  recommendations?: Prisma.ResumeUpdaterecommendationsInput | string[]
+  analyzedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -335,6 +449,11 @@ export type ResumeUncheckedUpdateManyInput = {
   storedName?: Prisma.StringFieldUpdateOperationsInput | string
   filePath?: Prisma.StringFieldUpdateOperationsInput | string
   extractedText?: Prisma.StringFieldUpdateOperationsInput | string
+  atsScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  detectedSkills?: Prisma.ResumeUpdatedetectedSkillsInput | string[]
+  strengths?: Prisma.ResumeUpdatestrengthsInput | string[]
+  recommendations?: Prisma.ResumeUpdaterecommendationsInput | string[]
+  analyzedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -356,9 +475,18 @@ export type ResumeCountOrderByAggregateInput = {
   storedName?: Prisma.SortOrder
   filePath?: Prisma.SortOrder
   extractedText?: Prisma.SortOrder
+  atsScore?: Prisma.SortOrder
+  detectedSkills?: Prisma.SortOrder
+  strengths?: Prisma.SortOrder
+  recommendations?: Prisma.SortOrder
+  analyzedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+}
+
+export type ResumeAvgOrderByAggregateInput = {
+  atsScore?: Prisma.SortOrder
 }
 
 export type ResumeMaxOrderByAggregateInput = {
@@ -367,6 +495,8 @@ export type ResumeMaxOrderByAggregateInput = {
   storedName?: Prisma.SortOrder
   filePath?: Prisma.SortOrder
   extractedText?: Prisma.SortOrder
+  atsScore?: Prisma.SortOrder
+  analyzedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
@@ -378,9 +508,15 @@ export type ResumeMinOrderByAggregateInput = {
   storedName?: Prisma.SortOrder
   filePath?: Prisma.SortOrder
   extractedText?: Prisma.SortOrder
+  atsScore?: Prisma.SortOrder
+  analyzedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+}
+
+export type ResumeSumOrderByAggregateInput = {
+  atsScore?: Prisma.SortOrder
 }
 
 export type ResumeCreateNestedManyWithoutUserInput = {
@@ -425,12 +561,56 @@ export type ResumeUncheckedUpdateManyWithoutUserNestedInput = {
   deleteMany?: Prisma.ResumeScalarWhereInput | Prisma.ResumeScalarWhereInput[]
 }
 
+export type ResumeCreatedetectedSkillsInput = {
+  set: string[]
+}
+
+export type ResumeCreatestrengthsInput = {
+  set: string[]
+}
+
+export type ResumeCreaterecommendationsInput = {
+  set: string[]
+}
+
+export type NullableIntFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
+export type ResumeUpdatedetectedSkillsInput = {
+  set?: string[]
+  push?: string | string[]
+}
+
+export type ResumeUpdatestrengthsInput = {
+  set?: string[]
+  push?: string | string[]
+}
+
+export type ResumeUpdaterecommendationsInput = {
+  set?: string[]
+  push?: string | string[]
+}
+
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
+}
+
 export type ResumeCreateWithoutUserInput = {
   id?: string
   originalName: string
   storedName: string
   filePath: string
   extractedText: string
+  atsScore?: number | null
+  detectedSkills?: Prisma.ResumeCreatedetectedSkillsInput | string[]
+  strengths?: Prisma.ResumeCreatestrengthsInput | string[]
+  recommendations?: Prisma.ResumeCreaterecommendationsInput | string[]
+  analyzedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -441,6 +621,11 @@ export type ResumeUncheckedCreateWithoutUserInput = {
   storedName: string
   filePath: string
   extractedText: string
+  atsScore?: number | null
+  detectedSkills?: Prisma.ResumeCreatedetectedSkillsInput | string[]
+  strengths?: Prisma.ResumeCreatestrengthsInput | string[]
+  recommendations?: Prisma.ResumeCreaterecommendationsInput | string[]
+  analyzedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -480,6 +665,11 @@ export type ResumeScalarWhereInput = {
   storedName?: Prisma.StringFilter<"Resume"> | string
   filePath?: Prisma.StringFilter<"Resume"> | string
   extractedText?: Prisma.StringFilter<"Resume"> | string
+  atsScore?: Prisma.IntNullableFilter<"Resume"> | number | null
+  detectedSkills?: Prisma.StringNullableListFilter<"Resume">
+  strengths?: Prisma.StringNullableListFilter<"Resume">
+  recommendations?: Prisma.StringNullableListFilter<"Resume">
+  analyzedAt?: Prisma.DateTimeNullableFilter<"Resume"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Resume"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Resume"> | Date | string
   userId?: Prisma.StringFilter<"Resume"> | string
@@ -491,6 +681,11 @@ export type ResumeCreateManyUserInput = {
   storedName: string
   filePath: string
   extractedText: string
+  atsScore?: number | null
+  detectedSkills?: Prisma.ResumeCreatedetectedSkillsInput | string[]
+  strengths?: Prisma.ResumeCreatestrengthsInput | string[]
+  recommendations?: Prisma.ResumeCreaterecommendationsInput | string[]
+  analyzedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -501,6 +696,11 @@ export type ResumeUpdateWithoutUserInput = {
   storedName?: Prisma.StringFieldUpdateOperationsInput | string
   filePath?: Prisma.StringFieldUpdateOperationsInput | string
   extractedText?: Prisma.StringFieldUpdateOperationsInput | string
+  atsScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  detectedSkills?: Prisma.ResumeUpdatedetectedSkillsInput | string[]
+  strengths?: Prisma.ResumeUpdatestrengthsInput | string[]
+  recommendations?: Prisma.ResumeUpdaterecommendationsInput | string[]
+  analyzedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -511,6 +711,11 @@ export type ResumeUncheckedUpdateWithoutUserInput = {
   storedName?: Prisma.StringFieldUpdateOperationsInput | string
   filePath?: Prisma.StringFieldUpdateOperationsInput | string
   extractedText?: Prisma.StringFieldUpdateOperationsInput | string
+  atsScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  detectedSkills?: Prisma.ResumeUpdatedetectedSkillsInput | string[]
+  strengths?: Prisma.ResumeUpdatestrengthsInput | string[]
+  recommendations?: Prisma.ResumeUpdaterecommendationsInput | string[]
+  analyzedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -521,6 +726,11 @@ export type ResumeUncheckedUpdateManyWithoutUserInput = {
   storedName?: Prisma.StringFieldUpdateOperationsInput | string
   filePath?: Prisma.StringFieldUpdateOperationsInput | string
   extractedText?: Prisma.StringFieldUpdateOperationsInput | string
+  atsScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  detectedSkills?: Prisma.ResumeUpdatedetectedSkillsInput | string[]
+  strengths?: Prisma.ResumeUpdatestrengthsInput | string[]
+  recommendations?: Prisma.ResumeUpdaterecommendationsInput | string[]
+  analyzedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -533,6 +743,11 @@ export type ResumeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   storedName?: boolean
   filePath?: boolean
   extractedText?: boolean
+  atsScore?: boolean
+  detectedSkills?: boolean
+  strengths?: boolean
+  recommendations?: boolean
+  analyzedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   userId?: boolean
@@ -545,6 +760,11 @@ export type ResumeSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   storedName?: boolean
   filePath?: boolean
   extractedText?: boolean
+  atsScore?: boolean
+  detectedSkills?: boolean
+  strengths?: boolean
+  recommendations?: boolean
+  analyzedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   userId?: boolean
@@ -557,6 +777,11 @@ export type ResumeSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   storedName?: boolean
   filePath?: boolean
   extractedText?: boolean
+  atsScore?: boolean
+  detectedSkills?: boolean
+  strengths?: boolean
+  recommendations?: boolean
+  analyzedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   userId?: boolean
@@ -569,12 +794,17 @@ export type ResumeSelectScalar = {
   storedName?: boolean
   filePath?: boolean
   extractedText?: boolean
+  atsScore?: boolean
+  detectedSkills?: boolean
+  strengths?: boolean
+  recommendations?: boolean
+  analyzedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   userId?: boolean
 }
 
-export type ResumeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "originalName" | "storedName" | "filePath" | "extractedText" | "createdAt" | "updatedAt" | "userId", ExtArgs["result"]["resume"]>
+export type ResumeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "originalName" | "storedName" | "filePath" | "extractedText" | "atsScore" | "detectedSkills" | "strengths" | "recommendations" | "analyzedAt" | "createdAt" | "updatedAt" | "userId", ExtArgs["result"]["resume"]>
 export type ResumeInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -596,6 +826,11 @@ export type $ResumePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     storedName: string
     filePath: string
     extractedText: string
+    atsScore: number | null
+    detectedSkills: string[]
+    strengths: string[]
+    recommendations: string[]
+    analyzedAt: Date | null
     createdAt: Date
     updatedAt: Date
     userId: string
@@ -1028,6 +1263,11 @@ export interface ResumeFieldRefs {
   readonly storedName: Prisma.FieldRef<"Resume", 'String'>
   readonly filePath: Prisma.FieldRef<"Resume", 'String'>
   readonly extractedText: Prisma.FieldRef<"Resume", 'String'>
+  readonly atsScore: Prisma.FieldRef<"Resume", 'Int'>
+  readonly detectedSkills: Prisma.FieldRef<"Resume", 'String[]'>
+  readonly strengths: Prisma.FieldRef<"Resume", 'String[]'>
+  readonly recommendations: Prisma.FieldRef<"Resume", 'String[]'>
+  readonly analyzedAt: Prisma.FieldRef<"Resume", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"Resume", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Resume", 'DateTime'>
   readonly userId: Prisma.FieldRef<"Resume", 'String'>

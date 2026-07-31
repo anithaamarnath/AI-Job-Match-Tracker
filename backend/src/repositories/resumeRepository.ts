@@ -1,5 +1,6 @@
 import { prisma } from "../config/prisma.js";
 
+
 interface CreateResumeData {
   originalName: string;
   storedName: string;
@@ -7,6 +8,15 @@ interface CreateResumeData {
   extractedText: string;
   userId: string;
 }
+
+interface UpdateResumeAnalysisData {
+  atsScore: number;
+  detectedSkills: string[];
+  strengths: string[];
+  recommendations: string[];
+}
+
+
 
 export const createResume = async (
   data: CreateResumeData
@@ -49,6 +59,26 @@ export const deleteResumeById = async (
     where: {
       id: resumeId,
       userId,
+    },
+  });
+};
+
+export const updateResumeAnalysis = async (
+  userId: string,
+  resumeId: string,
+  analysis: UpdateResumeAnalysisData
+) => {
+  return prisma.resume.updateMany({
+    where: {
+      id: resumeId,
+      userId,
+    },
+    data: {
+      atsScore: analysis.atsScore,
+      detectedSkills: analysis.detectedSkills,
+      strengths: analysis.strengths,
+      recommendations: analysis.recommendations,
+      analyzedAt: new Date(),
     },
   });
 };

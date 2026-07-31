@@ -4,6 +4,7 @@ import {
   analyzeResume,
   deleteResume,
   getResume,
+  getResumeAnalysis,
   getResumes,
   uploadResumeFile,
 } from "../controllers/resumeController.js";
@@ -25,10 +26,16 @@ router.get(
   getResumes
 );
 
-router.get(
+router.post(
   "/:id/analysis",
   authenticate,
   analyzeResume
+);
+
+router.get(
+  "/:id/analysis",
+  authenticate,
+  getResumeAnalysis
 );
 
 router.get(

@@ -5,6 +5,7 @@ import type {
 } from "express";
 import {
   analyzeSavedResume,
+  getSavedResumeAnalysis,
   deleteResumeHistoryById,
   getResumeHistory,
   getResumeHistoryById,
@@ -171,6 +172,44 @@ export const analyzeResume = async (
     res.status(200).json({
       success: true,
       message: "Resume analyzed successfully",
+      data: analysis,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getResumeAnalysis = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const userId = req.user?.id;
+    const resumeId = req.params.id;
+
+    if (!userId) {
+      throw new AppError(
+        "User is not authenticated",
+        401
+      );
+    }
+
+    if (!resumeId) {
+      throw new AppError(
+        "Resume ID is required",
+        400
+      );
+    }
+
+    const analysis = await getSavedResumeAnalysis(
+      userId,
+      resumeId
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Saved resume analysis retrieved successfully",
       data: analysis,
     });
   } catch (error) {

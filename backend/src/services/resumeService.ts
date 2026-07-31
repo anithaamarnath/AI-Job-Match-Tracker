@@ -127,3 +127,34 @@ export const analyzeSavedResume = async (
     ...analysis,
   };
 };
+
+export const getSavedResumeAnalysis = async (
+  userId: string,
+  resumeId: string
+) => {
+  const resume = await getResumeById(
+    userId,
+    resumeId
+  );
+
+  if (!resume) {
+    throw new AppError("Resume not found", 404);
+  }
+
+  if (resume.atsScore === null) {
+    throw new AppError(
+      "This resume has not been analyzed yet",
+      404
+    );
+  }
+
+  return {
+    resumeId: resume.id,
+    originalName: resume.originalName,
+    atsScore: resume.atsScore,
+    detectedSkills: resume.detectedSkills,
+    strengths: resume.strengths,
+    recommendations: resume.recommendations,
+    analyzedAt: resume.analyzedAt,
+  };
+};
