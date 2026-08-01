@@ -33,6 +33,7 @@ export const AppShell = ({ children }: AppShellProps) => {
           <NavLink to="/resumes">Resumes</NavLink>
 
           <NavLink to="/jobs">Jobs</NavLink>
+          <NavLink to="/matches">Matches</NavLink>
         </nav>
 
         <button
