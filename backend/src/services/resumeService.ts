@@ -1,11 +1,12 @@
 import fs from "node:fs/promises";
 import { createRequire } from "node:module";
-
+import { generateMockResumeAnalysis } from "./aiResumeService.js";
 import {
   createResume,
   deleteResumeById,
   getResumeById,
   getResumesByUserId,
+  updateAIResumeAnalysis
 } from "../repositories/resumeRepository.js";
 import {
   analyzeResumeText,
@@ -156,5 +157,97 @@ export const getSavedResumeAnalysis = async (
     strengths: resume.strengths,
     recommendations: resume.recommendations,
     analyzedAt: resume.analyzedAt,
+  };
+};
+
+export const generateAIResumeAnalysis = async (
+  userId: string,
+  resumeId: string
+) => {
+  const resume = await getResumeById(userId, resumeId);
+
+  if (!resume) {
+    throw new AppError("Resume not found", 404);
+  }
+
+  const analysis = await generateMockResumeAnalysis(
+    resume.extractedText
+  );
+
+  const updateResult = await updateAIResumeAnalysis(
+    userId,
+    resumeId,
+    {
+      provider: "MOCK",
+      professionalSummary: analysis.professionalSummary,
+      strengths: analysis.strengths,
+      weaknesses: analysis.weaknesses,
+      missingKeywords: analysis.missingKeywords,
+      improvedSummary: analysis.improvedSummary,
+      recommendations: analysis.recommendations,
+      atsScore: analysis.atsScore,
+    }
+  );
+
+  if (updateResult.count === 0) {
+    throw new AppError(
+      "AI analysis could not be saved",
+      500
+    );
+  }
+
+  const updatedResume = await getResumeById(
+    userId,
+    resumeId
+  );
+
+  return {
+    resumeId,
+    originalName: resume.originalName,
+    provider: updatedResume?.aiProvider,
+    professionalSummary:
+      updatedResume?.aiProfessionalSummary,
+    strengths: updatedResume?.aiStrengths ?? [],
+    weaknesses: updatedResume?.aiWeaknesses ?? [],
+    missingKeywords:
+      updatedResume?.aiMissingKeywords ?? [],
+    improvedSummary:
+      updatedResume?.aiImprovedSummary,
+    recommendations:
+      updatedResume?.aiRecommendations ?? [],
+    atsScore: updatedResume?.aiAtsScore,
+    analyzedAt: updatedResume?.aiAnalyzedAt,
+  };
+};
+
+export const getSavedAIResumeAnalysis = async (
+  userId: string,
+  resumeId: string
+) => {
+  const resume = await getResumeById(userId, resumeId);
+
+  if (!resume) {
+    throw new AppError("Resume not found", 404);
+  }
+
+  if (resume.aiAtsScore === null) {
+    throw new AppError(
+      "This resume has not received AI analysis yet",
+      404
+    );
+  }
+
+  return {
+    resumeId: resume.id,
+    originalName: resume.originalName,
+    provider: resume.aiProvider,
+    professionalSummary: resume.aiProfessionalSummary,
+    strengths: resume.aiStrengths,
+    weaknesses: resume.aiWeaknesses,
+    missingKeywords: resume.aiMissingKeywords,
+    improvedSummary: resume.aiImprovedSummary,
+    recommendations: resume.aiRecommendations,
+    atsScore: resume.aiAtsScore,
+    analyzedAt: resume.aiAnalyzedAt,
   };
 };

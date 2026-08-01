@@ -1,6 +1,8 @@
 import { Router } from "express";
 
 import {
+  getAIResumeAnalysis,
+  analyzeResumeWithAI,
   analyzeResume,
   deleteResume,
   getResume,
@@ -38,11 +40,30 @@ router.get(
   getResumeAnalysis
 );
 
+router.post(
+  "/:id/ai-analysis",
+  authenticate,
+  analyzeResumeWithAI
+);
+
+router.post(
+  "/:id/ai-analysis",
+  authenticate,
+  analyzeResumeWithAI
+);
+
+router.get(
+  "/:id/ai-analysis",
+  authenticate,
+  getAIResumeAnalysis
+);
+
 router.get(
   "/:id",
   authenticate,
   getResume
 );
+
 
 router.delete(
   "/:id",

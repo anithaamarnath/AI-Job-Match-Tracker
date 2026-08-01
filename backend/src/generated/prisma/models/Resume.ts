@@ -28,10 +28,12 @@ export type AggregateResume = {
 
 export type ResumeAvgAggregateOutputType = {
   atsScore: number | null
+  aiAtsScore: number | null
 }
 
 export type ResumeSumAggregateOutputType = {
   atsScore: number | null
+  aiAtsScore: number | null
 }
 
 export type ResumeMinAggregateOutputType = {
@@ -42,6 +44,11 @@ export type ResumeMinAggregateOutputType = {
   extractedText: string | null
   atsScore: number | null
   analyzedAt: Date | null
+  aiProvider: string | null
+  aiProfessionalSummary: string | null
+  aiImprovedSummary: string | null
+  aiAtsScore: number | null
+  aiAnalyzedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
   userId: string | null
@@ -55,6 +62,11 @@ export type ResumeMaxAggregateOutputType = {
   extractedText: string | null
   atsScore: number | null
   analyzedAt: Date | null
+  aiProvider: string | null
+  aiProfessionalSummary: string | null
+  aiImprovedSummary: string | null
+  aiAtsScore: number | null
+  aiAnalyzedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
   userId: string | null
@@ -71,6 +83,15 @@ export type ResumeCountAggregateOutputType = {
   strengths: number
   recommendations: number
   analyzedAt: number
+  aiProvider: number
+  aiProfessionalSummary: number
+  aiStrengths: number
+  aiWeaknesses: number
+  aiMissingKeywords: number
+  aiImprovedSummary: number
+  aiRecommendations: number
+  aiAtsScore: number
+  aiAnalyzedAt: number
   createdAt: number
   updatedAt: number
   userId: number
@@ -80,10 +101,12 @@ export type ResumeCountAggregateOutputType = {
 
 export type ResumeAvgAggregateInputType = {
   atsScore?: true
+  aiAtsScore?: true
 }
 
 export type ResumeSumAggregateInputType = {
   atsScore?: true
+  aiAtsScore?: true
 }
 
 export type ResumeMinAggregateInputType = {
@@ -94,6 +117,11 @@ export type ResumeMinAggregateInputType = {
   extractedText?: true
   atsScore?: true
   analyzedAt?: true
+  aiProvider?: true
+  aiProfessionalSummary?: true
+  aiImprovedSummary?: true
+  aiAtsScore?: true
+  aiAnalyzedAt?: true
   createdAt?: true
   updatedAt?: true
   userId?: true
@@ -107,6 +135,11 @@ export type ResumeMaxAggregateInputType = {
   extractedText?: true
   atsScore?: true
   analyzedAt?: true
+  aiProvider?: true
+  aiProfessionalSummary?: true
+  aiImprovedSummary?: true
+  aiAtsScore?: true
+  aiAnalyzedAt?: true
   createdAt?: true
   updatedAt?: true
   userId?: true
@@ -123,6 +156,15 @@ export type ResumeCountAggregateInputType = {
   strengths?: true
   recommendations?: true
   analyzedAt?: true
+  aiProvider?: true
+  aiProfessionalSummary?: true
+  aiStrengths?: true
+  aiWeaknesses?: true
+  aiMissingKeywords?: true
+  aiImprovedSummary?: true
+  aiRecommendations?: true
+  aiAtsScore?: true
+  aiAnalyzedAt?: true
   createdAt?: true
   updatedAt?: true
   userId?: true
@@ -226,6 +268,15 @@ export type ResumeGroupByOutputType = {
   strengths: string[]
   recommendations: string[]
   analyzedAt: Date | null
+  aiProvider: string | null
+  aiProfessionalSummary: string | null
+  aiStrengths: string[]
+  aiWeaknesses: string[]
+  aiMissingKeywords: string[]
+  aiImprovedSummary: string | null
+  aiRecommendations: string[]
+  aiAtsScore: number | null
+  aiAnalyzedAt: Date | null
   createdAt: Date
   updatedAt: Date
   userId: string
@@ -265,6 +316,15 @@ export type ResumeWhereInput = {
   strengths?: Prisma.StringNullableListFilter<"Resume">
   recommendations?: Prisma.StringNullableListFilter<"Resume">
   analyzedAt?: Prisma.DateTimeNullableFilter<"Resume"> | Date | string | null
+  aiProvider?: Prisma.StringNullableFilter<"Resume"> | string | null
+  aiProfessionalSummary?: Prisma.StringNullableFilter<"Resume"> | string | null
+  aiStrengths?: Prisma.StringNullableListFilter<"Resume">
+  aiWeaknesses?: Prisma.StringNullableListFilter<"Resume">
+  aiMissingKeywords?: Prisma.StringNullableListFilter<"Resume">
+  aiImprovedSummary?: Prisma.StringNullableFilter<"Resume"> | string | null
+  aiRecommendations?: Prisma.StringNullableListFilter<"Resume">
+  aiAtsScore?: Prisma.IntNullableFilter<"Resume"> | number | null
+  aiAnalyzedAt?: Prisma.DateTimeNullableFilter<"Resume"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Resume"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Resume"> | Date | string
   userId?: Prisma.StringFilter<"Resume"> | string
@@ -283,6 +343,15 @@ export type ResumeOrderByWithRelationInput = {
   strengths?: Prisma.SortOrder
   recommendations?: Prisma.SortOrder
   analyzedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  aiProvider?: Prisma.SortOrderInput | Prisma.SortOrder
+  aiProfessionalSummary?: Prisma.SortOrderInput | Prisma.SortOrder
+  aiStrengths?: Prisma.SortOrder
+  aiWeaknesses?: Prisma.SortOrder
+  aiMissingKeywords?: Prisma.SortOrder
+  aiImprovedSummary?: Prisma.SortOrderInput | Prisma.SortOrder
+  aiRecommendations?: Prisma.SortOrder
+  aiAtsScore?: Prisma.SortOrderInput | Prisma.SortOrder
+  aiAnalyzedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
@@ -304,6 +373,15 @@ export type ResumeWhereUniqueInput = Prisma.AtLeast<{
   strengths?: Prisma.StringNullableListFilter<"Resume">
   recommendations?: Prisma.StringNullableListFilter<"Resume">
   analyzedAt?: Prisma.DateTimeNullableFilter<"Resume"> | Date | string | null
+  aiProvider?: Prisma.StringNullableFilter<"Resume"> | string | null
+  aiProfessionalSummary?: Prisma.StringNullableFilter<"Resume"> | string | null
+  aiStrengths?: Prisma.StringNullableListFilter<"Resume">
+  aiWeaknesses?: Prisma.StringNullableListFilter<"Resume">
+  aiMissingKeywords?: Prisma.StringNullableListFilter<"Resume">
+  aiImprovedSummary?: Prisma.StringNullableFilter<"Resume"> | string | null
+  aiRecommendations?: Prisma.StringNullableListFilter<"Resume">
+  aiAtsScore?: Prisma.IntNullableFilter<"Resume"> | number | null
+  aiAnalyzedAt?: Prisma.DateTimeNullableFilter<"Resume"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Resume"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Resume"> | Date | string
   userId?: Prisma.StringFilter<"Resume"> | string
@@ -322,6 +400,15 @@ export type ResumeOrderByWithAggregationInput = {
   strengths?: Prisma.SortOrder
   recommendations?: Prisma.SortOrder
   analyzedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  aiProvider?: Prisma.SortOrderInput | Prisma.SortOrder
+  aiProfessionalSummary?: Prisma.SortOrderInput | Prisma.SortOrder
+  aiStrengths?: Prisma.SortOrder
+  aiWeaknesses?: Prisma.SortOrder
+  aiMissingKeywords?: Prisma.SortOrder
+  aiImprovedSummary?: Prisma.SortOrderInput | Prisma.SortOrder
+  aiRecommendations?: Prisma.SortOrder
+  aiAtsScore?: Prisma.SortOrderInput | Prisma.SortOrder
+  aiAnalyzedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
@@ -346,6 +433,15 @@ export type ResumeScalarWhereWithAggregatesInput = {
   strengths?: Prisma.StringNullableListFilter<"Resume">
   recommendations?: Prisma.StringNullableListFilter<"Resume">
   analyzedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Resume"> | Date | string | null
+  aiProvider?: Prisma.StringNullableWithAggregatesFilter<"Resume"> | string | null
+  aiProfessionalSummary?: Prisma.StringNullableWithAggregatesFilter<"Resume"> | string | null
+  aiStrengths?: Prisma.StringNullableListFilter<"Resume">
+  aiWeaknesses?: Prisma.StringNullableListFilter<"Resume">
+  aiMissingKeywords?: Prisma.StringNullableListFilter<"Resume">
+  aiImprovedSummary?: Prisma.StringNullableWithAggregatesFilter<"Resume"> | string | null
+  aiRecommendations?: Prisma.StringNullableListFilter<"Resume">
+  aiAtsScore?: Prisma.IntNullableWithAggregatesFilter<"Resume"> | number | null
+  aiAnalyzedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Resume"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Resume"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Resume"> | Date | string
   userId?: Prisma.StringWithAggregatesFilter<"Resume"> | string
@@ -362,6 +458,15 @@ export type ResumeCreateInput = {
   strengths?: Prisma.ResumeCreatestrengthsInput | string[]
   recommendations?: Prisma.ResumeCreaterecommendationsInput | string[]
   analyzedAt?: Date | string | null
+  aiProvider?: string | null
+  aiProfessionalSummary?: string | null
+  aiStrengths?: Prisma.ResumeCreateaiStrengthsInput | string[]
+  aiWeaknesses?: Prisma.ResumeCreateaiWeaknessesInput | string[]
+  aiMissingKeywords?: Prisma.ResumeCreateaiMissingKeywordsInput | string[]
+  aiImprovedSummary?: string | null
+  aiRecommendations?: Prisma.ResumeCreateaiRecommendationsInput | string[]
+  aiAtsScore?: number | null
+  aiAnalyzedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutResumesInput
@@ -379,6 +484,15 @@ export type ResumeUncheckedCreateInput = {
   strengths?: Prisma.ResumeCreatestrengthsInput | string[]
   recommendations?: Prisma.ResumeCreaterecommendationsInput | string[]
   analyzedAt?: Date | string | null
+  aiProvider?: string | null
+  aiProfessionalSummary?: string | null
+  aiStrengths?: Prisma.ResumeCreateaiStrengthsInput | string[]
+  aiWeaknesses?: Prisma.ResumeCreateaiWeaknessesInput | string[]
+  aiMissingKeywords?: Prisma.ResumeCreateaiMissingKeywordsInput | string[]
+  aiImprovedSummary?: string | null
+  aiRecommendations?: Prisma.ResumeCreateaiRecommendationsInput | string[]
+  aiAtsScore?: number | null
+  aiAnalyzedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   userId: string
@@ -396,6 +510,15 @@ export type ResumeUpdateInput = {
   strengths?: Prisma.ResumeUpdatestrengthsInput | string[]
   recommendations?: Prisma.ResumeUpdaterecommendationsInput | string[]
   analyzedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  aiProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aiProfessionalSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aiStrengths?: Prisma.ResumeUpdateaiStrengthsInput | string[]
+  aiWeaknesses?: Prisma.ResumeUpdateaiWeaknessesInput | string[]
+  aiMissingKeywords?: Prisma.ResumeUpdateaiMissingKeywordsInput | string[]
+  aiImprovedSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aiRecommendations?: Prisma.ResumeUpdateaiRecommendationsInput | string[]
+  aiAtsScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  aiAnalyzedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutResumesNestedInput
@@ -413,6 +536,15 @@ export type ResumeUncheckedUpdateInput = {
   strengths?: Prisma.ResumeUpdatestrengthsInput | string[]
   recommendations?: Prisma.ResumeUpdaterecommendationsInput | string[]
   analyzedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  aiProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aiProfessionalSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aiStrengths?: Prisma.ResumeUpdateaiStrengthsInput | string[]
+  aiWeaknesses?: Prisma.ResumeUpdateaiWeaknessesInput | string[]
+  aiMissingKeywords?: Prisma.ResumeUpdateaiMissingKeywordsInput | string[]
+  aiImprovedSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aiRecommendations?: Prisma.ResumeUpdateaiRecommendationsInput | string[]
+  aiAtsScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  aiAnalyzedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -430,6 +562,15 @@ export type ResumeCreateManyInput = {
   strengths?: Prisma.ResumeCreatestrengthsInput | string[]
   recommendations?: Prisma.ResumeCreaterecommendationsInput | string[]
   analyzedAt?: Date | string | null
+  aiProvider?: string | null
+  aiProfessionalSummary?: string | null
+  aiStrengths?: Prisma.ResumeCreateaiStrengthsInput | string[]
+  aiWeaknesses?: Prisma.ResumeCreateaiWeaknessesInput | string[]
+  aiMissingKeywords?: Prisma.ResumeCreateaiMissingKeywordsInput | string[]
+  aiImprovedSummary?: string | null
+  aiRecommendations?: Prisma.ResumeCreateaiRecommendationsInput | string[]
+  aiAtsScore?: number | null
+  aiAnalyzedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   userId: string
@@ -446,6 +587,15 @@ export type ResumeUpdateManyMutationInput = {
   strengths?: Prisma.ResumeUpdatestrengthsInput | string[]
   recommendations?: Prisma.ResumeUpdaterecommendationsInput | string[]
   analyzedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  aiProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aiProfessionalSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aiStrengths?: Prisma.ResumeUpdateaiStrengthsInput | string[]
+  aiWeaknesses?: Prisma.ResumeUpdateaiWeaknessesInput | string[]
+  aiMissingKeywords?: Prisma.ResumeUpdateaiMissingKeywordsInput | string[]
+  aiImprovedSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aiRecommendations?: Prisma.ResumeUpdateaiRecommendationsInput | string[]
+  aiAtsScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  aiAnalyzedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -461,6 +611,15 @@ export type ResumeUncheckedUpdateManyInput = {
   strengths?: Prisma.ResumeUpdatestrengthsInput | string[]
   recommendations?: Prisma.ResumeUpdaterecommendationsInput | string[]
   analyzedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  aiProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aiProfessionalSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aiStrengths?: Prisma.ResumeUpdateaiStrengthsInput | string[]
+  aiWeaknesses?: Prisma.ResumeUpdateaiWeaknessesInput | string[]
+  aiMissingKeywords?: Prisma.ResumeUpdateaiMissingKeywordsInput | string[]
+  aiImprovedSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aiRecommendations?: Prisma.ResumeUpdateaiRecommendationsInput | string[]
+  aiAtsScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  aiAnalyzedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -487,6 +646,15 @@ export type ResumeCountOrderByAggregateInput = {
   strengths?: Prisma.SortOrder
   recommendations?: Prisma.SortOrder
   analyzedAt?: Prisma.SortOrder
+  aiProvider?: Prisma.SortOrder
+  aiProfessionalSummary?: Prisma.SortOrder
+  aiStrengths?: Prisma.SortOrder
+  aiWeaknesses?: Prisma.SortOrder
+  aiMissingKeywords?: Prisma.SortOrder
+  aiImprovedSummary?: Prisma.SortOrder
+  aiRecommendations?: Prisma.SortOrder
+  aiAtsScore?: Prisma.SortOrder
+  aiAnalyzedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
@@ -494,6 +662,7 @@ export type ResumeCountOrderByAggregateInput = {
 
 export type ResumeAvgOrderByAggregateInput = {
   atsScore?: Prisma.SortOrder
+  aiAtsScore?: Prisma.SortOrder
 }
 
 export type ResumeMaxOrderByAggregateInput = {
@@ -504,6 +673,11 @@ export type ResumeMaxOrderByAggregateInput = {
   extractedText?: Prisma.SortOrder
   atsScore?: Prisma.SortOrder
   analyzedAt?: Prisma.SortOrder
+  aiProvider?: Prisma.SortOrder
+  aiProfessionalSummary?: Prisma.SortOrder
+  aiImprovedSummary?: Prisma.SortOrder
+  aiAtsScore?: Prisma.SortOrder
+  aiAnalyzedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
@@ -517,6 +691,11 @@ export type ResumeMinOrderByAggregateInput = {
   extractedText?: Prisma.SortOrder
   atsScore?: Prisma.SortOrder
   analyzedAt?: Prisma.SortOrder
+  aiProvider?: Prisma.SortOrder
+  aiProfessionalSummary?: Prisma.SortOrder
+  aiImprovedSummary?: Prisma.SortOrder
+  aiAtsScore?: Prisma.SortOrder
+  aiAnalyzedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
@@ -524,6 +703,7 @@ export type ResumeMinOrderByAggregateInput = {
 
 export type ResumeSumOrderByAggregateInput = {
   atsScore?: Prisma.SortOrder
+  aiAtsScore?: Prisma.SortOrder
 }
 
 export type ResumeScalarRelationFilter = {
@@ -585,6 +765,22 @@ export type ResumeCreaterecommendationsInput = {
   set: string[]
 }
 
+export type ResumeCreateaiStrengthsInput = {
+  set: string[]
+}
+
+export type ResumeCreateaiWeaknessesInput = {
+  set: string[]
+}
+
+export type ResumeCreateaiMissingKeywordsInput = {
+  set: string[]
+}
+
+export type ResumeCreateaiRecommendationsInput = {
+  set: string[]
+}
+
 export type NullableIntFieldUpdateOperationsInput = {
   set?: number | null
   increment?: number
@@ -612,6 +808,30 @@ export type NullableDateTimeFieldUpdateOperationsInput = {
   set?: Date | string | null
 }
 
+export type NullableStringFieldUpdateOperationsInput = {
+  set?: string | null
+}
+
+export type ResumeUpdateaiStrengthsInput = {
+  set?: string[]
+  push?: string | string[]
+}
+
+export type ResumeUpdateaiWeaknessesInput = {
+  set?: string[]
+  push?: string | string[]
+}
+
+export type ResumeUpdateaiMissingKeywordsInput = {
+  set?: string[]
+  push?: string | string[]
+}
+
+export type ResumeUpdateaiRecommendationsInput = {
+  set?: string[]
+  push?: string | string[]
+}
+
 export type ResumeCreateNestedOneWithoutResumeJobMatchesInput = {
   create?: Prisma.XOR<Prisma.ResumeCreateWithoutResumeJobMatchesInput, Prisma.ResumeUncheckedCreateWithoutResumeJobMatchesInput>
   connectOrCreate?: Prisma.ResumeCreateOrConnectWithoutResumeJobMatchesInput
@@ -637,6 +857,15 @@ export type ResumeCreateWithoutUserInput = {
   strengths?: Prisma.ResumeCreatestrengthsInput | string[]
   recommendations?: Prisma.ResumeCreaterecommendationsInput | string[]
   analyzedAt?: Date | string | null
+  aiProvider?: string | null
+  aiProfessionalSummary?: string | null
+  aiStrengths?: Prisma.ResumeCreateaiStrengthsInput | string[]
+  aiWeaknesses?: Prisma.ResumeCreateaiWeaknessesInput | string[]
+  aiMissingKeywords?: Prisma.ResumeCreateaiMissingKeywordsInput | string[]
+  aiImprovedSummary?: string | null
+  aiRecommendations?: Prisma.ResumeCreateaiRecommendationsInput | string[]
+  aiAtsScore?: number | null
+  aiAnalyzedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   resumeJobMatches?: Prisma.ResumeJobMatchCreateNestedManyWithoutResumeInput
@@ -653,6 +882,15 @@ export type ResumeUncheckedCreateWithoutUserInput = {
   strengths?: Prisma.ResumeCreatestrengthsInput | string[]
   recommendations?: Prisma.ResumeCreaterecommendationsInput | string[]
   analyzedAt?: Date | string | null
+  aiProvider?: string | null
+  aiProfessionalSummary?: string | null
+  aiStrengths?: Prisma.ResumeCreateaiStrengthsInput | string[]
+  aiWeaknesses?: Prisma.ResumeCreateaiWeaknessesInput | string[]
+  aiMissingKeywords?: Prisma.ResumeCreateaiMissingKeywordsInput | string[]
+  aiImprovedSummary?: string | null
+  aiRecommendations?: Prisma.ResumeCreateaiRecommendationsInput | string[]
+  aiAtsScore?: number | null
+  aiAnalyzedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   resumeJobMatches?: Prisma.ResumeJobMatchUncheckedCreateNestedManyWithoutResumeInput
@@ -698,6 +936,15 @@ export type ResumeScalarWhereInput = {
   strengths?: Prisma.StringNullableListFilter<"Resume">
   recommendations?: Prisma.StringNullableListFilter<"Resume">
   analyzedAt?: Prisma.DateTimeNullableFilter<"Resume"> | Date | string | null
+  aiProvider?: Prisma.StringNullableFilter<"Resume"> | string | null
+  aiProfessionalSummary?: Prisma.StringNullableFilter<"Resume"> | string | null
+  aiStrengths?: Prisma.StringNullableListFilter<"Resume">
+  aiWeaknesses?: Prisma.StringNullableListFilter<"Resume">
+  aiMissingKeywords?: Prisma.StringNullableListFilter<"Resume">
+  aiImprovedSummary?: Prisma.StringNullableFilter<"Resume"> | string | null
+  aiRecommendations?: Prisma.StringNullableListFilter<"Resume">
+  aiAtsScore?: Prisma.IntNullableFilter<"Resume"> | number | null
+  aiAnalyzedAt?: Prisma.DateTimeNullableFilter<"Resume"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Resume"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Resume"> | Date | string
   userId?: Prisma.StringFilter<"Resume"> | string
@@ -714,6 +961,15 @@ export type ResumeCreateWithoutResumeJobMatchesInput = {
   strengths?: Prisma.ResumeCreatestrengthsInput | string[]
   recommendations?: Prisma.ResumeCreaterecommendationsInput | string[]
   analyzedAt?: Date | string | null
+  aiProvider?: string | null
+  aiProfessionalSummary?: string | null
+  aiStrengths?: Prisma.ResumeCreateaiStrengthsInput | string[]
+  aiWeaknesses?: Prisma.ResumeCreateaiWeaknessesInput | string[]
+  aiMissingKeywords?: Prisma.ResumeCreateaiMissingKeywordsInput | string[]
+  aiImprovedSummary?: string | null
+  aiRecommendations?: Prisma.ResumeCreateaiRecommendationsInput | string[]
+  aiAtsScore?: number | null
+  aiAnalyzedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutResumesInput
@@ -730,6 +986,15 @@ export type ResumeUncheckedCreateWithoutResumeJobMatchesInput = {
   strengths?: Prisma.ResumeCreatestrengthsInput | string[]
   recommendations?: Prisma.ResumeCreaterecommendationsInput | string[]
   analyzedAt?: Date | string | null
+  aiProvider?: string | null
+  aiProfessionalSummary?: string | null
+  aiStrengths?: Prisma.ResumeCreateaiStrengthsInput | string[]
+  aiWeaknesses?: Prisma.ResumeCreateaiWeaknessesInput | string[]
+  aiMissingKeywords?: Prisma.ResumeCreateaiMissingKeywordsInput | string[]
+  aiImprovedSummary?: string | null
+  aiRecommendations?: Prisma.ResumeCreateaiRecommendationsInput | string[]
+  aiAtsScore?: number | null
+  aiAnalyzedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   userId: string
@@ -762,6 +1027,15 @@ export type ResumeUpdateWithoutResumeJobMatchesInput = {
   strengths?: Prisma.ResumeUpdatestrengthsInput | string[]
   recommendations?: Prisma.ResumeUpdaterecommendationsInput | string[]
   analyzedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  aiProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aiProfessionalSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aiStrengths?: Prisma.ResumeUpdateaiStrengthsInput | string[]
+  aiWeaknesses?: Prisma.ResumeUpdateaiWeaknessesInput | string[]
+  aiMissingKeywords?: Prisma.ResumeUpdateaiMissingKeywordsInput | string[]
+  aiImprovedSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aiRecommendations?: Prisma.ResumeUpdateaiRecommendationsInput | string[]
+  aiAtsScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  aiAnalyzedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutResumesNestedInput
@@ -778,6 +1052,15 @@ export type ResumeUncheckedUpdateWithoutResumeJobMatchesInput = {
   strengths?: Prisma.ResumeUpdatestrengthsInput | string[]
   recommendations?: Prisma.ResumeUpdaterecommendationsInput | string[]
   analyzedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  aiProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aiProfessionalSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aiStrengths?: Prisma.ResumeUpdateaiStrengthsInput | string[]
+  aiWeaknesses?: Prisma.ResumeUpdateaiWeaknessesInput | string[]
+  aiMissingKeywords?: Prisma.ResumeUpdateaiMissingKeywordsInput | string[]
+  aiImprovedSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aiRecommendations?: Prisma.ResumeUpdateaiRecommendationsInput | string[]
+  aiAtsScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  aiAnalyzedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -794,6 +1077,15 @@ export type ResumeCreateManyUserInput = {
   strengths?: Prisma.ResumeCreatestrengthsInput | string[]
   recommendations?: Prisma.ResumeCreaterecommendationsInput | string[]
   analyzedAt?: Date | string | null
+  aiProvider?: string | null
+  aiProfessionalSummary?: string | null
+  aiStrengths?: Prisma.ResumeCreateaiStrengthsInput | string[]
+  aiWeaknesses?: Prisma.ResumeCreateaiWeaknessesInput | string[]
+  aiMissingKeywords?: Prisma.ResumeCreateaiMissingKeywordsInput | string[]
+  aiImprovedSummary?: string | null
+  aiRecommendations?: Prisma.ResumeCreateaiRecommendationsInput | string[]
+  aiAtsScore?: number | null
+  aiAnalyzedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -809,6 +1101,15 @@ export type ResumeUpdateWithoutUserInput = {
   strengths?: Prisma.ResumeUpdatestrengthsInput | string[]
   recommendations?: Prisma.ResumeUpdaterecommendationsInput | string[]
   analyzedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  aiProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aiProfessionalSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aiStrengths?: Prisma.ResumeUpdateaiStrengthsInput | string[]
+  aiWeaknesses?: Prisma.ResumeUpdateaiWeaknessesInput | string[]
+  aiMissingKeywords?: Prisma.ResumeUpdateaiMissingKeywordsInput | string[]
+  aiImprovedSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aiRecommendations?: Prisma.ResumeUpdateaiRecommendationsInput | string[]
+  aiAtsScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  aiAnalyzedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   resumeJobMatches?: Prisma.ResumeJobMatchUpdateManyWithoutResumeNestedInput
@@ -825,6 +1126,15 @@ export type ResumeUncheckedUpdateWithoutUserInput = {
   strengths?: Prisma.ResumeUpdatestrengthsInput | string[]
   recommendations?: Prisma.ResumeUpdaterecommendationsInput | string[]
   analyzedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  aiProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aiProfessionalSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aiStrengths?: Prisma.ResumeUpdateaiStrengthsInput | string[]
+  aiWeaknesses?: Prisma.ResumeUpdateaiWeaknessesInput | string[]
+  aiMissingKeywords?: Prisma.ResumeUpdateaiMissingKeywordsInput | string[]
+  aiImprovedSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aiRecommendations?: Prisma.ResumeUpdateaiRecommendationsInput | string[]
+  aiAtsScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  aiAnalyzedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   resumeJobMatches?: Prisma.ResumeJobMatchUncheckedUpdateManyWithoutResumeNestedInput
@@ -841,6 +1151,15 @@ export type ResumeUncheckedUpdateManyWithoutUserInput = {
   strengths?: Prisma.ResumeUpdatestrengthsInput | string[]
   recommendations?: Prisma.ResumeUpdaterecommendationsInput | string[]
   analyzedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  aiProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aiProfessionalSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aiStrengths?: Prisma.ResumeUpdateaiStrengthsInput | string[]
+  aiWeaknesses?: Prisma.ResumeUpdateaiWeaknessesInput | string[]
+  aiMissingKeywords?: Prisma.ResumeUpdateaiMissingKeywordsInput | string[]
+  aiImprovedSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aiRecommendations?: Prisma.ResumeUpdateaiRecommendationsInput | string[]
+  aiAtsScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  aiAnalyzedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -887,6 +1206,15 @@ export type ResumeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   strengths?: boolean
   recommendations?: boolean
   analyzedAt?: boolean
+  aiProvider?: boolean
+  aiProfessionalSummary?: boolean
+  aiStrengths?: boolean
+  aiWeaknesses?: boolean
+  aiMissingKeywords?: boolean
+  aiImprovedSummary?: boolean
+  aiRecommendations?: boolean
+  aiAtsScore?: boolean
+  aiAnalyzedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   userId?: boolean
@@ -906,6 +1234,15 @@ export type ResumeSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   strengths?: boolean
   recommendations?: boolean
   analyzedAt?: boolean
+  aiProvider?: boolean
+  aiProfessionalSummary?: boolean
+  aiStrengths?: boolean
+  aiWeaknesses?: boolean
+  aiMissingKeywords?: boolean
+  aiImprovedSummary?: boolean
+  aiRecommendations?: boolean
+  aiAtsScore?: boolean
+  aiAnalyzedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   userId?: boolean
@@ -923,6 +1260,15 @@ export type ResumeSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   strengths?: boolean
   recommendations?: boolean
   analyzedAt?: boolean
+  aiProvider?: boolean
+  aiProfessionalSummary?: boolean
+  aiStrengths?: boolean
+  aiWeaknesses?: boolean
+  aiMissingKeywords?: boolean
+  aiImprovedSummary?: boolean
+  aiRecommendations?: boolean
+  aiAtsScore?: boolean
+  aiAnalyzedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   userId?: boolean
@@ -940,12 +1286,21 @@ export type ResumeSelectScalar = {
   strengths?: boolean
   recommendations?: boolean
   analyzedAt?: boolean
+  aiProvider?: boolean
+  aiProfessionalSummary?: boolean
+  aiStrengths?: boolean
+  aiWeaknesses?: boolean
+  aiMissingKeywords?: boolean
+  aiImprovedSummary?: boolean
+  aiRecommendations?: boolean
+  aiAtsScore?: boolean
+  aiAnalyzedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   userId?: boolean
 }
 
-export type ResumeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "originalName" | "storedName" | "filePath" | "extractedText" | "atsScore" | "detectedSkills" | "strengths" | "recommendations" | "analyzedAt" | "createdAt" | "updatedAt" | "userId", ExtArgs["result"]["resume"]>
+export type ResumeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "originalName" | "storedName" | "filePath" | "extractedText" | "atsScore" | "detectedSkills" | "strengths" | "recommendations" | "analyzedAt" | "aiProvider" | "aiProfessionalSummary" | "aiStrengths" | "aiWeaknesses" | "aiMissingKeywords" | "aiImprovedSummary" | "aiRecommendations" | "aiAtsScore" | "aiAnalyzedAt" | "createdAt" | "updatedAt" | "userId", ExtArgs["result"]["resume"]>
 export type ResumeInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   resumeJobMatches?: boolean | Prisma.Resume$resumeJobMatchesArgs<ExtArgs>
@@ -975,6 +1330,15 @@ export type $ResumePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     strengths: string[]
     recommendations: string[]
     analyzedAt: Date | null
+    aiProvider: string | null
+    aiProfessionalSummary: string | null
+    aiStrengths: string[]
+    aiWeaknesses: string[]
+    aiMissingKeywords: string[]
+    aiImprovedSummary: string | null
+    aiRecommendations: string[]
+    aiAtsScore: number | null
+    aiAnalyzedAt: Date | null
     createdAt: Date
     updatedAt: Date
     userId: string
@@ -1413,6 +1777,15 @@ export interface ResumeFieldRefs {
   readonly strengths: Prisma.FieldRef<"Resume", 'String[]'>
   readonly recommendations: Prisma.FieldRef<"Resume", 'String[]'>
   readonly analyzedAt: Prisma.FieldRef<"Resume", 'DateTime'>
+  readonly aiProvider: Prisma.FieldRef<"Resume", 'String'>
+  readonly aiProfessionalSummary: Prisma.FieldRef<"Resume", 'String'>
+  readonly aiStrengths: Prisma.FieldRef<"Resume", 'String[]'>
+  readonly aiWeaknesses: Prisma.FieldRef<"Resume", 'String[]'>
+  readonly aiMissingKeywords: Prisma.FieldRef<"Resume", 'String[]'>
+  readonly aiImprovedSummary: Prisma.FieldRef<"Resume", 'String'>
+  readonly aiRecommendations: Prisma.FieldRef<"Resume", 'String[]'>
+  readonly aiAtsScore: Prisma.FieldRef<"Resume", 'Int'>
+  readonly aiAnalyzedAt: Prisma.FieldRef<"Resume", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"Resume", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Resume", 'DateTime'>
   readonly userId: Prisma.FieldRef<"Resume", 'String'>

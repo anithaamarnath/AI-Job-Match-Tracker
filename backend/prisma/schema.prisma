@@ -66,6 +66,16 @@ model Resume {
   recommendations String[]  @default([])
   analyzedAt      DateTime?
 
+  aiProvider            String?
+  aiProfessionalSummary String?   @db.Text
+  aiStrengths           String[]  @default([])
+  aiWeaknesses          String[]  @default([])
+  aiMissingKeywords     String[]  @default([])
+  aiImprovedSummary     String?   @db.Text
+  aiRecommendations     String[]  @default([])
+  aiAtsScore            Int?
+  aiAnalyzedAt          DateTime?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

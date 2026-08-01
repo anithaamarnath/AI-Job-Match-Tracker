@@ -16,6 +16,16 @@ interface UpdateResumeAnalysisData {
   recommendations: string[];
 }
 
+export interface UpdateAIResumeAnalysisData {
+  provider: string;
+  professionalSummary: string;
+  strengths: string[];
+  weaknesses: string[];
+  missingKeywords: string[];
+  improvedSummary: string;
+  recommendations: string[];
+  atsScore: number;
+}
 
 
 export const createResume = async (
@@ -79,6 +89,30 @@ export const updateResumeAnalysis = async (
       strengths: analysis.strengths,
       recommendations: analysis.recommendations,
       analyzedAt: new Date(),
+    },
+  });
+};
+
+export const updateAIResumeAnalysis = async (
+  userId: string,
+  resumeId: string,
+  analysis: UpdateAIResumeAnalysisData
+) => {
+  return prisma.resume.updateMany({
+    where: {
+      id: resumeId,
+      userId,
+    },
+    data: {
+      aiProvider: analysis.provider,
+      aiProfessionalSummary: analysis.professionalSummary,
+      aiStrengths: analysis.strengths,
+      aiWeaknesses: analysis.weaknesses,
+      aiMissingKeywords: analysis.missingKeywords,
+      aiImprovedSummary: analysis.improvedSummary,
+      aiRecommendations: analysis.recommendations,
+      aiAtsScore: analysis.atsScore,
+      aiAnalyzedAt: new Date(),
     },
   });
 };

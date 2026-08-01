@@ -11,7 +11,10 @@ import {
   getResumeHistoryById,
   saveUploadedResume,
 } from "../services/resumeService.js";
-
+import {
+  generateAIResumeAnalysis,
+  getSavedAIResumeAnalysis
+} from "../services/resumeService.js";
 
 
 import { AppError } from "../utils/AppError.js";
@@ -211,6 +214,65 @@ export const getResumeAnalysis = async (
       success: true,
       message: "Saved resume analysis retrieved successfully",
       data: analysis,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const analyzeResumeWithAI = async (
+  req: Request<{ id: string }>,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const userId = req.user?.id;
+
+    if (!userId) {
+      throw new AppError(
+        "User is not authenticated",
+        401
+      );
+    }
+
+    const result = await generateAIResumeAnalysis(
+      userId,
+      req.params.id
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "AI resume analysis completed",
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+export const getAIResumeAnalysis = async (
+  req: Request<{ id: string }>,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const userId = req.user?.id;
+
+    if (!userId) {
+      throw new AppError(
+        "User is not authenticated",
+        401
+      );
+    }
+
+    const result = await getSavedAIResumeAnalysis(
+      userId,
+      req.params.id
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Saved AI resume analysis retrieved",
+      data: result,
     });
   } catch (error) {
     next(error);
