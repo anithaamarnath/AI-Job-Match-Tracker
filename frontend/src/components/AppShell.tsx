@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+
 import { NavLink, useNavigate } from "react-router-dom";
 
 interface AppShellProps {
@@ -22,6 +23,7 @@ export const AppShell = ({ children }: AppShellProps) => {
       <aside className="sidebar">
         <div>
           <p className="brand-eyebrow">AI Career Tools</p>
+
           <h1 className="brand-title">Job Match</h1>
         </div>
 
@@ -29,6 +31,8 @@ export const AppShell = ({ children }: AppShellProps) => {
           <NavLink to="/dashboard">Dashboard</NavLink>
 
           <NavLink to="/resumes">Resumes</NavLink>
+
+          <NavLink to="/jobs">Jobs</NavLink>
         </nav>
 
         <button

@@ -1,9 +1,11 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
 import { DashboardPage } from "../pages/DashboardPage";
+import { JobsPage } from "../pages/JobsPage";
 import { LoginPage } from "../pages/LoginPage";
-import { ResumesPage } from "../pages/ResumesPage";
 import { ResumeDetailsPage } from "../pages/ResumeDetailsPage";
+import { ResumesPage } from "../pages/ResumesPage";
+
 import { ProtectedRoute } from "./ProtectedRoute";
 
 export const AppRoutes = () => {
@@ -16,7 +18,10 @@ export const AppRoutes = () => {
           <Route path="/dashboard" element={<DashboardPage />} />
 
           <Route path="/resumes" element={<ResumesPage />} />
+
           <Route path="/resumes/:id" element={<ResumeDetailsPage />} />
+
+          <Route path="/jobs" element={<JobsPage />} />
         </Route>
 
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
