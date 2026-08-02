@@ -1,4 +1,18 @@
-export type MatchConfidence = "LOW" | "MEDIUM" | "HIGH";
+export type MatchConfidence =
+  | "LOW"
+  | "MEDIUM"
+  | "HIGH";
+
+export interface MatchResumeSummary {
+  id: string;
+  originalName: string;
+}
+
+export interface MatchJobSummary {
+  id: string;
+  company: string;
+  role: string;
+}
 
 export interface ResumeJobMatch {
   id?: string;
@@ -13,6 +27,9 @@ export interface ResumeJobMatch {
   additionalSkills: string[];
   recommendations: string[];
   createdAt?: string;
+
+  resume?: MatchResumeSummary;
+  job?: MatchJobSummary;
 }
 
 export interface CreateResumeJobMatchInput {

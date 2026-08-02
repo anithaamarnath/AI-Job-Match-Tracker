@@ -14,3 +14,10 @@ export interface CreateJobInput {
   role: string;
   description: string;
 }
+
+export interface UpdateJobInput {
+  company: string;
+  role: string;
+  description: string;
+  status?: string;
+}

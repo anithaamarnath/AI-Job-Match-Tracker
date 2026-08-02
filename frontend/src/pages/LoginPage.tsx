@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import { apiClient } from "../api/client";
 
@@ -16,12 +17,29 @@ interface LoginResponse {
   };
 }
 
+interface LocationState {
+  message?: string;
+}
+
+const getErrorMessage = (error: unknown): string => {
+  if (axios.isAxiosError(error)) {
+    return error.response?.data?.message ?? "Invalid email or password.";
+  }
+
+  return "An unexpected error occurred.";
+};
+
 export const LoginPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const state = location.state as LocationState | null;
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
   const [errorMessage, setErrorMessage] = useState("");
+
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -32,7 +50,7 @@ export const LoginPage = () => {
       setErrorMessage("");
 
       const response = await apiClient.post<LoginResponse>("/auth/login", {
-        email,
+        email: email.trim().toLowerCase(),
         password,
       });
 
@@ -40,49 +58,75 @@ export const LoginPage = () => {
 
       localStorage.setItem("user", JSON.stringify(response.data.data.user));
 
-      navigate("/dashboard");
-    } catch {
-      setErrorMessage("Invalid email or password");
+      navigate("/dashboard", {
+        replace: true,
+      });
+    } catch (error) {
+      setErrorMessage(getErrorMessage(error));
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <main>
-      <h1>Login</h1>
+    <main className="auth-page">
+      <section className="auth-card">
+        <div className="auth-intro">
+          <p className="page-eyebrow">AI Job Match Tracker</p>
 
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="email">Email</label>
+          <h1>Welcome back</h1>
 
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            required
-          />
+          <p>Log in to manage your resumes, jobs, and match results.</p>
         </div>
 
-        <div>
-          <label htmlFor="password">Password</label>
+        {state?.message && (
+          <p className="auth-success" role="status">
+            {state.message}
+          </p>
+        )}
 
-          <input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            required
-          />
-        </div>
+        <form className="auth-form" onSubmit={handleSubmit}>
+          <div className="form-field">
+            <label htmlFor="login-email">Email</label>
 
-        {errorMessage && <p role="alert">{errorMessage}</p>}
+            <input
+              id="login-email"
+              type="email"
+              autoComplete="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              required
+            />
+          </div>
 
-        <button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Logging in..." : "Login"}
-        </button>
-      </form>
+          <div className="form-field">
+            <label htmlFor="login-password">Password</label>
+
+            <input
+              id="login-password"
+              type="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              required
+            />
+          </div>
+
+          {errorMessage && (
+            <p className="auth-error" role="alert">
+              {errorMessage}
+            </p>
+          )}
+
+          <button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "Logging in..." : "Log in"}
+          </button>
+        </form>
+
+        <p className="auth-footer">
+          New to the application? <Link to="/register">Create an account</Link>
+        </p>
+      </section>
     </main>
   );
 };

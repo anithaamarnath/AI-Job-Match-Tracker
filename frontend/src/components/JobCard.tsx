@@ -1,12 +1,19 @@
 import type { Job } from "../types/job";
+import { Link } from "react-router-dom";
 
 interface JobCardProps {
   job: Job;
   isDeleting: boolean;
+  onEdit: (job: Job) => void;
   onDelete: (jobId: string) => void;
 }
 
-export const JobCard = ({ job, isDeleting, onDelete }: JobCardProps) => {
+export const JobCard = ({
+  job,
+  isDeleting,
+  onEdit,
+  onDelete,
+}: JobCardProps) => {
   const createdDate = new Intl.DateTimeFormat("en-CA", {
     dateStyle: "medium",
   }).format(new Date(job.createdAt));
@@ -27,12 +34,25 @@ export const JobCard = ({ job, isDeleting, onDelete }: JobCardProps) => {
 
       <p className="job-description">{job.description}</p>
 
-      <div className="job-card-actions">
+      <div className="job-card-actions job-card-actions-three">
+        <Link className="job-details-link" to={`/jobs/${job.id}`}>
+          View details
+        </Link>
+
+        <button
+          type="button"
+          className="edit-button"
+          onClick={() => onEdit(job)}
+          disabled={isDeleting}
+        >
+          Edit job
+        </button>
+
         <button
           type="button"
           className="danger-button"
-          disabled={isDeleting}
           onClick={() => onDelete(job.id)}
+          disabled={isDeleting}
         >
           {isDeleting ? "Deleting..." : "Delete job"}
         </button>

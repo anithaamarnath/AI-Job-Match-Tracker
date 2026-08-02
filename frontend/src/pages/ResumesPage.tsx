@@ -2,16 +2,20 @@ import { useRef, useState } from "react";
 import axios from "axios";
 
 import { AppShell } from "../components/AppShell";
+import { ConfirmModal } from "../components/ConfirmModal";
 import { ErrorState } from "../components/ErrorState";
 import { LoadingState } from "../components/LoadingState";
 import { ResumeCard } from "../components/ResumeCard";
+import { Toast } from "../components/Toast";
 
 import {
   useDeleteResume,
   useGenerateAIAnalysis,
   useResumes,
   useUploadResume,
-} from "../hooks/useResume.js";
+} from "../hooks/useResume";
+
+import { useToast } from "../hooks/useToast";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
@@ -35,7 +39,9 @@ export const ResumesPage = () => {
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  const [message, setMessage] = useState("");
+  const [resumeIdToDelete, setResumeIdToDelete] = useState<string | null>(null);
+
+  const { toast, showToast, hideToast } = useToast();
 
   const resumesQuery = useResumes();
   const uploadMutation = useUploadResume();
@@ -43,8 +49,6 @@ export const ResumesPage = () => {
   const analysisMutation = useGenerateAIAnalysis();
 
   const handleFileSelection = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setMessage("");
-
     const file = event.target.files?.[0];
 
     if (!file) {
@@ -53,13 +57,15 @@ export const ResumesPage = () => {
     }
 
     if (!allowedFileTypes.includes(file.type)) {
-      setMessage("Only PDF and DOCX files are allowed.");
+      showToast("Only PDF and DOCX files are allowed.", "error");
+
       event.target.value = "";
       return;
     }
 
     if (file.size > MAX_FILE_SIZE) {
-      setMessage("The resume must be smaller than 5 MB.");
+      showToast("The resume must be smaller than 5 MB.", "error");
+
       event.target.value = "";
       return;
     }
@@ -69,55 +75,55 @@ export const ResumesPage = () => {
 
   const handleUpload = async () => {
     if (!selectedFile) {
-      setMessage("Select a resume before uploading.");
+      showToast("Select a resume before uploading.", "error");
       return;
     }
 
     try {
-      setMessage("");
-
       await uploadMutation.mutateAsync(selectedFile);
 
       setSelectedFile(null);
-      setMessage("Resume uploaded successfully.");
 
       if (inputRef.current) {
         inputRef.current.value = "";
       }
+
+      showToast("Resume uploaded successfully.", "success");
     } catch (error) {
-      setMessage(getErrorMessage(error));
+      showToast(getErrorMessage(error), "error");
     }
   };
 
-  const handleDelete = async (resumeId: string) => {
-    const confirmed = window.confirm(
-      "Delete this resume and its saved analyses?",
-    );
+  const handleDeleteRequest = (resumeId: string) => {
+    console.log("Resume delete requested:", resumeId);
+    setResumeIdToDelete(resumeId);
+  };
 
-    if (!confirmed) {
+  const handleDeleteConfirm = async () => {
+    if (!resumeIdToDelete) {
       return;
     }
 
     try {
-      setMessage("");
+      console.log("Deleting resume:", resumeIdToDelete);
 
-      await deleteMutation.mutateAsync(resumeId);
+      await deleteMutation.mutateAsync(resumeIdToDelete);
 
-      setMessage("Resume deleted successfully.");
+      setResumeIdToDelete(null);
+
+      showToast("Resume deleted successfully.", "success");
     } catch (error) {
-      setMessage(getErrorMessage(error));
+      showToast(getErrorMessage(error), "error");
     }
   };
 
   const handleAnalyze = async (resumeId: string) => {
     try {
-      setMessage("");
-
       await analysisMutation.mutateAsync(resumeId);
 
-      setMessage("Mock AI analysis completed and saved.");
+      showToast("Mock AI analysis completed and saved.", "success");
     } catch (error) {
-      setMessage(getErrorMessage(error));
+      showToast(getErrorMessage(error), "error");
     }
   };
 
@@ -164,12 +170,6 @@ export const ResumesPage = () => {
           </button>
         </section>
 
-        {message && (
-          <p className="status-message" role="status">
-            {message}
-          </p>
-        )}
-
         <section>
           <div className="section-heading">
             <h2>Your resumes</h2>
@@ -193,6 +193,7 @@ export const ResumesPage = () => {
           {resumesQuery.data?.length === 0 && (
             <div className="empty-state">
               <h2>No resumes uploaded</h2>
+
               <p>
                 Upload your first resume to start analysis and job matching.
               </p>
@@ -213,7 +214,7 @@ export const ResumesPage = () => {
                     analysisMutation.isPending &&
                     analysisMutation.variables === resume.id
                   }
-                  onDelete={handleDelete}
+                  onDelete={handleDeleteRequest}
                   onAnalyze={handleAnalyze}
                 />
               ))}
@@ -221,6 +222,30 @@ export const ResumesPage = () => {
           )}
         </section>
       </main>
+
+      {toast && (
+        <Toast
+          message={toast.message}
+          variant={toast.variant}
+          onClose={hideToast}
+        />
+      )}
+
+      <ConfirmModal
+        isOpen={Boolean(resumeIdToDelete)}
+        title="Delete resume?"
+        message="This will permanently delete the resume and its saved analyses."
+        confirmLabel="Delete resume"
+        isConfirming={deleteMutation.isPending}
+        onCancel={() => {
+          if (!deleteMutation.isPending) {
+            setResumeIdToDelete(null);
+          }
+        }}
+        onConfirm={() => {
+          void handleDeleteConfirm();
+        }}
+      />
     </AppShell>
   );
 };

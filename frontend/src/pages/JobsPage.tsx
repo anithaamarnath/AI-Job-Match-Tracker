@@ -2,11 +2,21 @@ import { useState } from "react";
 import axios from "axios";
 
 import { AppShell } from "../components/AppShell";
+import { ConfirmModal } from "../components/ConfirmModal";
 import { ErrorState } from "../components/ErrorState";
 import { JobCard } from "../components/JobCard";
 import { LoadingState } from "../components/LoadingState";
+import { Toast } from "../components/Toast";
 
-import { useCreateJob, useDeleteJob, useJobs } from "../hooks/useJobs";
+import { useToast } from "../hooks/useToast";
+import {
+  useCreateJob,
+  useDeleteJob,
+  useJobs,
+  useUpdateJob,
+} from "../hooks/useJobs";
+
+import type { Job } from "../types/job";
 
 const getErrorMessage = (error: unknown): string => {
   if (axios.isAxiosError(error)) {
@@ -21,58 +31,107 @@ const getErrorMessage = (error: unknown): string => {
 export const JobsPage = () => {
   const jobsQuery = useJobs();
   const createMutation = useCreateJob();
+  const updateMutation = useUpdateJob();
   const deleteMutation = useDeleteJob();
 
   const [company, setCompany] = useState("");
   const [role, setRole] = useState("");
   const [description, setDescription] = useState("");
 
-  const [message, setMessage] = useState("");
+  const [editingJobId, setEditingJobId] = useState<string | null>(null);
+
+  const [jobIdToDelete, setJobIdToDelete] = useState<string | null>(null);
+
+  const { toast, showToast, hideToast } = useToast();
+
+  const isSaving = createMutation.isPending || updateMutation.isPending;
+
+  const resetForm = () => {
+    setCompany("");
+    setRole("");
+    setDescription("");
+    setEditingJobId(null);
+  };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!company.trim() || !role.trim() || description.trim().length < 10) {
-      setMessage(
+    const trimmedCompany = company.trim();
+    const trimmedRole = role.trim();
+    const trimmedDescription = description.trim();
+
+    if (!trimmedCompany || !trimmedRole || trimmedDescription.length < 10) {
+      showToast(
         "Enter a company, role, and description with at least 10 characters.",
+        "error",
       );
+
       return;
     }
 
+    const input = {
+      company: trimmedCompany,
+      role: trimmedRole,
+      description: trimmedDescription,
+    };
+
     try {
-      setMessage("");
+      if (editingJobId) {
+        await updateMutation.mutateAsync({
+          jobId: editingJobId,
+          input,
+        });
 
-      await createMutation.mutateAsync({
-        company: company.trim(),
-        role: role.trim(),
-        description: description.trim(),
-      });
+        showToast("Job updated successfully.", "success");
+      } else {
+        await createMutation.mutateAsync(input);
 
-      setCompany("");
-      setRole("");
-      setDescription("");
+        showToast("Job saved successfully.", "success");
+      }
 
-      setMessage("Job saved successfully.");
+      resetForm();
     } catch (error) {
-      setMessage(getErrorMessage(error));
+      showToast(getErrorMessage(error), "error");
     }
   };
 
-  const handleDelete = async (jobId: string) => {
-    const confirmed = window.confirm("Delete this saved job?");
+  const handleEdit = (job: Job) => {
+    setEditingJobId(job.id);
+    setCompany(job.company);
+    setRole(job.role);
+    setDescription(job.description);
 
-    if (!confirmed) {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
+  const handleCancelEdit = () => {
+    resetForm();
+  };
+
+  const handleDeleteRequest = (jobId: string) => {
+    setJobIdToDelete(jobId);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!jobIdToDelete) {
       return;
     }
 
     try {
-      setMessage("");
+      await deleteMutation.mutateAsync(jobIdToDelete);
 
-      await deleteMutation.mutateAsync(jobId);
+      if (editingJobId === jobIdToDelete) {
+        resetForm();
+      }
 
-      setMessage("Job deleted successfully.");
+      setJobIdToDelete(null);
+
+      showToast("Job deleted successfully.", "success");
     } catch (error) {
-      setMessage(getErrorMessage(error));
+      showToast(getErrorMessage(error), "error");
     }
   };
 
@@ -91,8 +150,13 @@ export const JobsPage = () => {
 
         <section className="job-form-panel">
           <div>
-            <h2>Add a job</h2>
-            <p>Save the company, role, and full job description.</p>
+            <h2>{editingJobId ? "Edit job" : "Add a job"}</h2>
+
+            <p>
+              {editingJobId
+                ? "Update the company, role, or job description."
+                : "Save the company, role, and full job description."}
+            </p>
           </div>
 
           <form className="job-form" onSubmit={handleSubmit}>
@@ -105,6 +169,8 @@ export const JobsPage = () => {
                 value={company}
                 onChange={(event) => setCompany(event.target.value)}
                 placeholder="Amazon"
+                disabled={isSaving}
+                required
               />
             </div>
 
@@ -117,6 +183,8 @@ export const JobsPage = () => {
                 value={role}
                 onChange={(event) => setRole(event.target.value)}
                 placeholder="Software Developer"
+                disabled={isSaving}
+                required
               />
             </div>
 
@@ -129,20 +197,33 @@ export const JobsPage = () => {
                 onChange={(event) => setDescription(event.target.value)}
                 placeholder="Paste the complete job description..."
                 rows={8}
+                disabled={isSaving}
+                required
               />
             </div>
 
-            <button type="submit" disabled={createMutation.isPending}>
-              {createMutation.isPending ? "Saving..." : "Save job"}
-            </button>
+            <div className="job-form-actions">
+              <button type="submit" disabled={isSaving}>
+                {isSaving
+                  ? "Saving..."
+                  : editingJobId
+                    ? "Update job"
+                    : "Save job"}
+              </button>
+
+              {editingJobId && (
+                <button
+                  type="button"
+                  className="modal-cancel-button"
+                  onClick={handleCancelEdit}
+                  disabled={isSaving}
+                >
+                  Cancel editing
+                </button>
+              )}
+            </div>
           </form>
         </section>
-
-        {message && (
-          <p className="status-message" role="status">
-            {message}
-          </p>
-        )}
 
         <section>
           <div className="section-heading">
@@ -180,13 +261,38 @@ export const JobsPage = () => {
                     deleteMutation.isPending &&
                     deleteMutation.variables === job.id
                   }
-                  onDelete={handleDelete}
+                  onEdit={handleEdit}
+                  onDelete={handleDeleteRequest}
                 />
               ))}
             </div>
           )}
         </section>
       </main>
+
+      {toast && (
+        <Toast
+          message={toast.message}
+          variant={toast.variant}
+          onClose={hideToast}
+        />
+      )}
+
+      <ConfirmModal
+        isOpen={Boolean(jobIdToDelete)}
+        title="Delete job?"
+        message="This will permanently delete the saved job and its related match history."
+        confirmLabel="Delete job"
+        isConfirming={deleteMutation.isPending}
+        onCancel={() => {
+          if (!deleteMutation.isPending) {
+            setJobIdToDelete(null);
+          }
+        }}
+        onConfirm={() => {
+          void handleDeleteConfirm();
+        }}
+      />
     </AppShell>
   );
 };
