@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import axios from "axios";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -43,6 +43,16 @@ const jobFormSchema = z.object({
 
 type JobFormValues = z.infer<typeof jobFormSchema>;
 
+type JobStatusFilter =
+  | "ALL"
+  | "SAVED"
+  | "APPLIED"
+  | "INTERVIEW"
+  | "REJECTED"
+  | "OFFER";
+
+type JobSortOption = "NEWEST" | "OLDEST" | "COMPANY" | "ROLE";
+
 const getErrorMessage = (error: unknown): string => {
   if (axios.isAxiosError(error)) {
     return (
@@ -63,6 +73,12 @@ export const JobsPage = () => {
 
   const [jobIdToDelete, setJobIdToDelete] = useState<string | null>(null);
 
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const [statusFilter, setStatusFilter] = useState<JobStatusFilter>("ALL");
+
+  const [sortOption, setSortOption] = useState<JobSortOption>("NEWEST");
+
   const { toast, showToast, hideToast } = useToast();
 
   const {
@@ -81,6 +97,47 @@ export const JobsPage = () => {
 
   const isSaving =
     isSubmitting || createMutation.isPending || updateMutation.isPending;
+
+  const filteredJobs = useMemo(() => {
+    const jobs = jobsQuery.data ?? [];
+
+    const normalizedSearch = searchTerm.trim().toLowerCase();
+
+    const filtered = jobs.filter((job) => {
+      const matchesSearch =
+        !normalizedSearch ||
+        job.company.toLowerCase().includes(normalizedSearch) ||
+        job.role.toLowerCase().includes(normalizedSearch);
+
+      const matchesStatus =
+        statusFilter === "ALL" || job.status.toUpperCase() === statusFilter;
+
+      return matchesSearch && matchesStatus;
+    });
+
+    return [...filtered].sort((first, second) => {
+      switch (sortOption) {
+        case "OLDEST":
+          return (
+            new Date(first.createdAt).getTime() -
+            new Date(second.createdAt).getTime()
+          );
+
+        case "COMPANY":
+          return first.company.localeCompare(second.company);
+
+        case "ROLE":
+          return first.role.localeCompare(second.role);
+
+        case "NEWEST":
+        default:
+          return (
+            new Date(second.createdAt).getTime() -
+            new Date(first.createdAt).getTime()
+          );
+      }
+    });
+  }, [jobsQuery.data, searchTerm, statusFilter, sortOption]);
 
   const resetForm = () => {
     reset({
@@ -150,6 +207,12 @@ export const JobsPage = () => {
     } catch (error) {
       showToast(getErrorMessage(error), "error");
     }
+  };
+
+  const clearSearchAndFilters = () => {
+    setSearchTerm("");
+    setStatusFilter("ALL");
+    setSortOption("NEWEST");
   };
 
   return (
@@ -266,11 +329,76 @@ export const JobsPage = () => {
           </form>
         </section>
 
+        <section className="list-controls-panel">
+          <div className="list-controls">
+            <div className="form-field search-field">
+              <label htmlFor="job-search">Search jobs</label>
+
+              <input
+                id="job-search"
+                type="search"
+                value={searchTerm}
+                onChange={(event) => setSearchTerm(event.target.value)}
+                placeholder="Search company or role..."
+              />
+            </div>
+
+            <div className="form-field">
+              <label htmlFor="job-status-filter">Status</label>
+
+              <select
+                id="job-status-filter"
+                value={statusFilter}
+                onChange={(event) =>
+                  setStatusFilter(event.target.value as JobStatusFilter)
+                }
+              >
+                <option value="ALL">All statuses</option>
+                <option value="SAVED">Saved</option>
+                <option value="APPLIED">Applied</option>
+                <option value="INTERVIEW">Interview</option>
+                <option value="REJECTED">Rejected</option>
+                <option value="OFFER">Offer</option>
+              </select>
+            </div>
+
+            <div className="form-field">
+              <label htmlFor="job-sort">Sort by</label>
+
+              <select
+                id="job-sort"
+                value={sortOption}
+                onChange={(event) =>
+                  setSortOption(event.target.value as JobSortOption)
+                }
+              >
+                <option value="NEWEST">Newest first</option>
+                <option value="OLDEST">Oldest first</option>
+                <option value="COMPANY">Company A–Z</option>
+                <option value="ROLE">Role A–Z</option>
+              </select>
+            </div>
+
+            <button
+              type="button"
+              className="clear-filters-button"
+              onClick={clearSearchAndFilters}
+              disabled={
+                !searchTerm && statusFilter === "ALL" && sortOption === "NEWEST"
+              }
+            >
+              Clear
+            </button>
+          </div>
+        </section>
+
         <section>
           <div className="section-heading">
             <h2>Your jobs</h2>
 
-            <span>{jobsQuery.data?.length ?? 0} total</span>
+            <span>
+              {filteredJobs.length} of {jobsQuery.data?.length ?? 0}
+            </span>
           </div>
 
           {jobsQuery.isPending && <LoadingState message="Loading jobs..." />}
@@ -284,17 +412,23 @@ export const JobsPage = () => {
             />
           )}
 
-          {jobsQuery.data?.length === 0 && (
-            <div className="empty-state">
-              <h2>No jobs saved</h2>
+          {!jobsQuery.isPending &&
+            !jobsQuery.isError &&
+            filteredJobs.length === 0 && (
+              <div className="empty-state">
+                <h2>No matching jobs</h2>
 
-              <p>Add your first job description to start matching resumes.</p>
-            </div>
-          )}
+                <p>Try changing your search, filter, or sorting options.</p>
 
-          {jobsQuery.data && jobsQuery.data.length > 0 && (
+                <button type="button" onClick={clearSearchAndFilters}>
+                  Clear filters
+                </button>
+              </div>
+            )}
+
+          {filteredJobs.length > 0 && (
             <div className="job-grid">
-              {jobsQuery.data.map((job) => (
+              {filteredJobs.map((job) => (
                 <JobCard
                   key={job.id}
                   job={job}
