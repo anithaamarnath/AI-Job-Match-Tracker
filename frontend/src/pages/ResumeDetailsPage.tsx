@@ -8,6 +8,7 @@ import {
   useResume,
   useSavedAIAnalysis,
 } from "../hooks/useResume";
+import { ResumePreview } from "../components/ResumePreview";
 
 export const ResumeDetailsPage = () => {
   const { id = "" } = useParams<{ id: string }>();
@@ -66,8 +67,8 @@ export const ResumeDetailsPage = () => {
           </p>
         </header>
 
-        <section className="details-grid">
-          <article className="resume-card">
+        <section className="resume-overview-section">
+          <article className="resume-card resume-overview-card">
             <h2>Resume overview</h2>
 
             <dl>
@@ -99,9 +100,13 @@ export const ResumeDetailsPage = () => {
                 : "Run mock AI analysis"}
             </button>
           </article>
+        </section>
 
-          {analysis && (
-            <article className="resume-card">
+        <ResumePreview resumeId={resume.id} fileName={resume.originalName} />
+
+        {analysis && (
+          <section className="resume-analysis-section">
+            <article className="resume-card resume-analysis-card">
               <h2>AI analysis</h2>
 
               <h3>Professional summary</h3>
@@ -140,8 +145,8 @@ export const ResumeDetailsPage = () => {
                 ))}
               </ul>
             </article>
-          )}
-        </section>
+          </section>
+        )}
       </main>
     </AppShell>
   );

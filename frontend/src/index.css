@@ -1314,3 +1314,76 @@ a {
 .form-field select[aria-invalid="true"]:focus {
   outline-color: rgba(180, 35, 53, 0.16);
 }
+
+.resume-preview-panel {
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+
+  background: #ffffff;
+  border: 1px solid #dfe4ee;
+  border-radius: 16px;
+
+  box-shadow:
+    0 12px 35px rgba(26, 41, 73, 0.06);
+}
+
+.resume-preview-header {
+  margin-bottom: 1rem;
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.resume-preview-header h2 {
+  margin: 0.35rem 0 0;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.resume-preview-header a {
+  flex-shrink: 0;
+
+  padding: 0.7rem 0.9rem;
+
+  border-radius: 10px;
+  background: #eef3ff;
+  color: #2457e6;
+
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.resume-preview-frame {
+  width: 100%;
+  height: 760px;
+
+  border: 1px solid #dfe4ee;
+  border-radius: 12px;
+
+  background: #f4f6fa;
+}
+
+.preview-error {
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+
+  border: 1px solid #f0bec6;
+  border-radius: 16px;
+
+  background: #fff0f2;
+  color: #9d2333;
+}
+
+@media (max-width: 760px) {
+  .resume-preview-header {
+    flex-direction: column;
+  }
+
+  .resume-preview-frame {
+    height: 560px;
+  }
+}

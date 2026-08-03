@@ -66,3 +66,16 @@ export const generateAIAnalysis = async (
 
   return response.data.data;
 };
+
+export const getResumePreview = async (
+  resumeId: string
+): Promise<Blob> => {
+  const response = await apiClient.get(
+    `/resume/${resumeId}/preview`,
+    {
+      responseType: "blob",
+    }
+  );
+
+  return response.data;
+};
