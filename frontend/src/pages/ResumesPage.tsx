@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import axios from "axios";
 
 import { AppShell } from "../components/AppShell";
@@ -40,6 +40,14 @@ export const ResumesPage = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const [resumeIdToDelete, setResumeIdToDelete] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [analysisFilter, setAnalysisFilter] = useState<
+    "ALL" | "ANALYZED" | "NOT_ANALYZED"
+  >("ALL");
+
+  const [sortOrder, setSortOrder] = useState<
+    "NEWEST" | "OLDEST" | "HIGHEST_ATS"
+  >("NEWEST");
 
   const { toast, showToast, hideToast } = useToast();
 
@@ -47,6 +55,45 @@ export const ResumesPage = () => {
   const uploadMutation = useUploadResume();
   const deleteMutation = useDeleteResume();
   const analysisMutation = useGenerateAIAnalysis();
+
+  const filteredResumes = useMemo(() => {
+    const resumes = resumesQuery.data ?? [];
+
+    const normalizedSearch = searchTerm.trim().toLowerCase();
+
+    const filtered = resumes.filter((resume) => {
+      const matchesSearch =
+        normalizedSearch === "" ||
+        resume.originalName.toLowerCase().includes(normalizedSearch);
+
+      const isAnalyzed = resume.aiAtsScore !== null || resume.atsScore !== null;
+
+      const matchesFilter =
+        analysisFilter === "ALL" ||
+        (analysisFilter === "ANALYZED" && isAnalyzed) ||
+        (analysisFilter === "NOT_ANALYZED" && !isAnalyzed);
+
+      return matchesSearch && matchesFilter;
+    });
+
+    return filtered.sort((a, b) => {
+      if (sortOrder === "OLDEST") {
+        return (
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        );
+      }
+
+      if (sortOrder === "HIGHEST_ATS") {
+        const scoreA = a.aiAtsScore ?? a.atsScore ?? -1;
+
+        const scoreB = b.aiAtsScore ?? b.atsScore ?? -1;
+
+        return scoreB - scoreA;
+      }
+
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+  }, [resumesQuery.data, searchTerm, analysisFilter, sortOrder]);
 
   const handleFileSelection = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -170,11 +217,62 @@ export const ResumesPage = () => {
           </button>
         </section>
 
+        <section className="resume-toolbar">
+          <div className="resume-search">
+            <label>Search</label>
+
+            <input
+              type="search"
+              placeholder="Search resume..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+
+          <div className="resume-filter">
+            <label>Filter</label>
+
+            <select
+              value={analysisFilter}
+              onChange={(e) =>
+                setAnalysisFilter(
+                  e.target.value as "ALL" | "ANALYZED" | "NOT_ANALYZED",
+                )
+              }
+            >
+              <option value="ALL">All resumes</option>
+
+              <option value="ANALYZED">AI Analyzed</option>
+
+              <option value="NOT_ANALYZED">Not analyzed</option>
+            </select>
+          </div>
+
+          <div className="resume-filter">
+            <label>Sort</label>
+
+            <select
+              value={sortOrder}
+              onChange={(e) =>
+                setSortOrder(
+                  e.target.value as "NEWEST" | "OLDEST" | "HIGHEST_ATS",
+                )
+              }
+            >
+              <option value="NEWEST">Newest</option>
+
+              <option value="OLDEST">Oldest</option>
+
+              <option value="HIGHEST_ATS">Highest ATS</option>
+            </select>
+          </div>
+        </section>
+
         <section>
           <div className="section-heading">
             <h2>Your resumes</h2>
 
-            <span>{resumesQuery.data?.length ?? 0} total</span>
+            <span>{filteredResumes.length} shown</span>
           </div>
 
           {resumesQuery.isPending && (
@@ -202,7 +300,16 @@ export const ResumesPage = () => {
 
           {resumesQuery.data && resumesQuery.data.length > 0 && (
             <div className="resume-grid">
-              {resumesQuery.data.map((resume) => (
+              {resumesQuery.data &&
+                resumesQuery.data.length > 0 &&
+                filteredResumes.length === 0 && (
+                  <div className="empty-state">
+                    <h2>No matching resumes</h2>
+
+                    <p>Try another search or filter.</p>
+                  </div>
+                )}
+              {filteredResumes.map((resume) => (
                 <ResumeCard
                   key={resume.id}
                   resume={resume}

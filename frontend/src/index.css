@@ -1387,3 +1387,30 @@ a {
     height: 560px;
   }
 }
+
+.resume-toolbar{
+    display:grid;
+    grid-template-columns:2fr 1fr 1fr;
+    gap:16px;
+
+    margin-bottom:24px;
+}
+
+.resume-search,
+.resume-filter{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+}
+
+.resume-search input,
+.resume-filter select{
+
+    height:46px;
+
+    padding:0 14px;
+
+    border:1px solid #dfe4ee;
+
+    border-radius:10px;
+}
