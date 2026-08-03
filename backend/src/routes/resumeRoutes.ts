@@ -8,6 +8,7 @@ import {
   getResume,
   getResumeAnalysis,
   getResumes,
+  previewResumeFile,
   uploadResumeFile,
 } from "../controllers/resumeController.js";
 import { authenticate } from "../middleware/authMiddleware.js";
@@ -26,6 +27,12 @@ router.get(
   "/",
   authenticate,
   getResumes
+);
+
+router.get(
+  "/:id/preview",
+  authenticate,
+  previewResumeFile
 );
 
 router.post(

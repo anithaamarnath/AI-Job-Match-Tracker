@@ -15,6 +15,7 @@ import {
   generateAIResumeAnalysis,
   getSavedAIResumeAnalysis
 } from "../services/resumeService.js";
+import path from "node:path";
 
 
 import { AppError } from "../utils/AppError.js";
@@ -273,6 +274,37 @@ export const getAIResumeAnalysis = async (
       success: true,
       message: "Saved AI resume analysis retrieved",
       data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const previewResumeFile = async (
+  req: Request<{ id: string }>,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const userId = req.user?.id;
+
+    if (!userId) {
+      throw new AppError("User is not authenticated", 401);
+    }
+
+    const resume = await getResumeHistoryById(
+      userId,
+      req.params.id
+    );
+
+    const absoluteFilePath = path.resolve(
+      resume.filePath
+    );
+
+    res.sendFile(absoluteFilePath, (error) => {
+      if (error) {
+        next(error);
+      }
     });
   } catch (error) {
     next(error);
