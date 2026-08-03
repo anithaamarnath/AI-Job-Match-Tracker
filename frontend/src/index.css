@@ -969,8 +969,17 @@ a {
 }
 
 .auth-error {
+  margin: 0;
+  padding: 0.8rem 0.95rem;
+
+  border: 1px solid #f0bec6;
+  border-radius: 10px;
+
   background: #fff0f2;
   color: #9d2333;
+
+  font-size: 0.9rem;
+  font-weight: 700;
 }
 
 .auth-success {

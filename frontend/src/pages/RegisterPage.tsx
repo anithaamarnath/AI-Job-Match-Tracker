@@ -1,8 +1,41 @@
 import { useState } from "react";
 import axios from "axios";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
+import { z } from "zod";
 
 import { apiClient } from "../api/client";
+
+const registerSchema = z
+  .object({
+    name: z
+      .string()
+      .trim()
+      .min(2, "Name must contain at least 2 characters.")
+      .max(100, "Name must be 100 characters or fewer."),
+
+    email: z
+      .string()
+      .trim()
+      .min(1, "Email is required.")
+      .email("Enter a valid email address."),
+
+    password: z
+      .string()
+      .min(8, "Password must contain at least 8 characters.")
+      .regex(/[A-Z]/, "Password must contain an uppercase letter.")
+      .regex(/[a-z]/, "Password must contain a lowercase letter.")
+      .regex(/\d/, "Password must contain a number."),
+
+    confirmPassword: z.string(),
+  })
+  .refine((values) => values.password === values.confirmPassword, {
+    message: "Passwords do not match.",
+    path: ["confirmPassword"],
+  });
+
+type RegisterFormValues = z.infer<typeof registerSchema>;
 
 interface RegisterResponse {
   success: boolean;
@@ -22,7 +55,10 @@ const getErrorMessage = (error: unknown): string => {
     const validationErrors = error.response?.data?.errors;
 
     if (Array.isArray(validationErrors) && validationErrors.length > 0) {
-      return validationErrors.map((item) => item.message).join(" ");
+      return validationErrors
+        .map((item: { message?: string }) => item.message)
+        .filter(Boolean)
+        .join(" ");
     }
 
     return (
@@ -35,43 +71,32 @@ const getErrorMessage = (error: unknown): string => {
 
 export const RegisterPage = () => {
   const navigate = useNavigate();
+  const [apiError, setApiError] = useState("");
 
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<RegisterFormValues>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    },
+  });
 
-  const [errorMessage, setErrorMessage] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setErrorMessage("");
-
-    if (name.trim().length < 2) {
-      setErrorMessage("Name must contain at least 2 characters.");
-      return;
-    }
-
-    if (password.length < 8) {
-      setErrorMessage("Password must contain at least 8 characters.");
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setErrorMessage("Passwords do not match.");
-      return;
-    }
-
+  const onSubmit = async (values: RegisterFormValues) => {
     try {
-      setIsSubmitting(true);
+      setApiError("");
 
       const response = await apiClient.post<RegisterResponse>(
         "/auth/register",
         {
-          name: name.trim(),
-          email: email.trim().toLowerCase(),
-          password,
+          name: values.name.trim(),
+          email: values.email.trim().toLowerCase(),
+          password: values.password,
         },
       );
 
@@ -79,6 +104,7 @@ export const RegisterPage = () => {
 
       if (token) {
         localStorage.setItem("accessToken", token);
+
         localStorage.setItem("user", JSON.stringify(response.data.data.user));
 
         navigate("/dashboard", {
@@ -95,9 +121,7 @@ export const RegisterPage = () => {
         },
       });
     } catch (error) {
-      setErrorMessage(getErrorMessage(error));
-    } finally {
-      setIsSubmitting(false);
+      setApiError(getErrorMessage(error));
     }
   };
 
@@ -115,7 +139,11 @@ export const RegisterPage = () => {
           </p>
         </div>
 
-        <form className="auth-form" onSubmit={handleSubmit}>
+        <form
+          className="auth-form"
+          onSubmit={handleSubmit(onSubmit)}
+          noValidate
+        >
           <div className="form-field">
             <label htmlFor="name">Full name</label>
 
@@ -123,11 +151,13 @@ export const RegisterPage = () => {
               id="name"
               type="text"
               autoComplete="name"
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-              placeholder="Your full name"
-              required
+              aria-invalid={errors.name ? "true" : "false"}
+              {...register("name")}
             />
+
+            {errors.name && (
+              <p className="field-error">{errors.name.message}</p>
+            )}
           </div>
 
           <div className="form-field">
@@ -137,11 +167,13 @@ export const RegisterPage = () => {
               id="register-email"
               type="email"
               autoComplete="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              placeholder="you@example.com"
-              required
+              aria-invalid={errors.email ? "true" : "false"}
+              {...register("email")}
             />
+
+            {errors.email && (
+              <p className="field-error">{errors.email.message}</p>
+            )}
           </div>
 
           <div className="form-field">
@@ -151,10 +183,13 @@ export const RegisterPage = () => {
               id="register-password"
               type="password"
               autoComplete="new-password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              required
+              aria-invalid={errors.password ? "true" : "false"}
+              {...register("password")}
             />
+
+            {errors.password && (
+              <p className="field-error">{errors.password.message}</p>
+            )}
           </div>
 
           <div className="form-field">
@@ -164,15 +199,18 @@ export const RegisterPage = () => {
               id="confirm-password"
               type="password"
               autoComplete="new-password"
-              value={confirmPassword}
-              onChange={(event) => setConfirmPassword(event.target.value)}
-              required
+              aria-invalid={errors.confirmPassword ? "true" : "false"}
+              {...register("confirmPassword")}
             />
+
+            {errors.confirmPassword && (
+              <p className="field-error">{errors.confirmPassword.message}</p>
+            )}
           </div>
 
-          {errorMessage && (
+          {apiError && (
             <p className="auth-error" role="alert">
-              {errorMessage}
+              {apiError}
             </p>
           )}
 

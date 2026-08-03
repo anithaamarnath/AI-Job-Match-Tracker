@@ -1,8 +1,23 @@
 import { useState } from "react";
 import axios from "axios";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { z } from "zod";
 
 import { apiClient } from "../api/client";
+
+const loginSchema = z.object({
+  email: z
+    .string()
+    .trim()
+    .min(1, "Email is required.")
+    .email("Enter a valid email address."),
+
+  password: z.string().min(1, "Password is required."),
+});
+
+type LoginFormValues = z.infer<typeof loginSchema>;
 
 interface LoginResponse {
   success: boolean;
@@ -35,23 +50,27 @@ export const LoginPage = () => {
 
   const state = location.state as LocationState | null;
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [apiError, setApiError] = useState("");
 
-  const [errorMessage, setErrorMessage] = useState("");
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
+  const onSubmit = async (values: LoginFormValues): Promise<void> => {
     try {
-      setIsSubmitting(true);
-      setErrorMessage("");
+      setApiError("");
 
       const response = await apiClient.post<LoginResponse>("/auth/login", {
-        email: email.trim().toLowerCase(),
-        password,
+        email: values.email.trim().toLowerCase(),
+        password: values.password,
       });
 
       localStorage.setItem("accessToken", response.data.data.token);
@@ -62,9 +81,7 @@ export const LoginPage = () => {
         replace: true,
       });
     } catch (error) {
-      setErrorMessage(getErrorMessage(error));
-    } finally {
-      setIsSubmitting(false);
+      setApiError(getErrorMessage(error));
     }
   };
 
@@ -85,7 +102,11 @@ export const LoginPage = () => {
           </p>
         )}
 
-        <form className="auth-form" onSubmit={handleSubmit}>
+        <form
+          className="auth-form"
+          onSubmit={handleSubmit(onSubmit)}
+          noValidate
+        >
           <div className="form-field">
             <label htmlFor="login-email">Email</label>
 
@@ -93,10 +114,17 @@ export const LoginPage = () => {
               id="login-email"
               type="email"
               autoComplete="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              required
+              aria-invalid={errors.email ? "true" : "false"}
+              {...register("email", {
+                onChange: () => {
+                  setApiError("");
+                },
+              })}
             />
+
+            {errors.email && (
+              <p className="field-error">{errors.email.message}</p>
+            )}
           </div>
 
           <div className="form-field">
@@ -106,15 +134,22 @@ export const LoginPage = () => {
               id="login-password"
               type="password"
               autoComplete="current-password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              required
+              aria-invalid={errors.password ? "true" : "false"}
+              {...register("password", {
+                onChange: () => {
+                  setApiError("");
+                },
+              })}
             />
+
+            {errors.password && (
+              <p className="field-error">{errors.password.message}</p>
+            )}
           </div>
 
-          {errorMessage && (
+          {apiError && (
             <p className="auth-error" role="alert">
-              {errorMessage}
+              {apiError}
             </p>
           )}
 
