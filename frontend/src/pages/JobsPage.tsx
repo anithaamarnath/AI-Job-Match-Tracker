@@ -1,5 +1,8 @@
 import { useState } from "react";
 import axios from "axios";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 
 import { AppShell } from "../components/AppShell";
 import { ConfirmModal } from "../components/ConfirmModal";
@@ -18,6 +21,28 @@ import {
 
 import type { Job } from "../types/job";
 
+const jobFormSchema = z.object({
+  company: z
+    .string()
+    .trim()
+    .min(2, "Company must contain at least 2 characters.")
+    .max(100, "Company must be 100 characters or fewer."),
+
+  role: z
+    .string()
+    .trim()
+    .min(2, "Role must contain at least 2 characters.")
+    .max(120, "Role must be 120 characters or fewer."),
+
+  description: z
+    .string()
+    .trim()
+    .min(10, "Job description must contain at least 10 characters.")
+    .max(20_000, "Job description must be 20,000 characters or fewer."),
+});
+
+type JobFormValues = z.infer<typeof jobFormSchema>;
+
 const getErrorMessage = (error: unknown): string => {
   if (axios.isAxiosError(error)) {
     return (
@@ -34,57 +59,50 @@ export const JobsPage = () => {
   const updateMutation = useUpdateJob();
   const deleteMutation = useDeleteJob();
 
-  const [company, setCompany] = useState("");
-  const [role, setRole] = useState("");
-  const [description, setDescription] = useState("");
-
   const [editingJobId, setEditingJobId] = useState<string | null>(null);
 
   const [jobIdToDelete, setJobIdToDelete] = useState<string | null>(null);
 
   const { toast, showToast, hideToast } = useToast();
 
-  const isSaving = createMutation.isPending || updateMutation.isPending;
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting, isDirty },
+  } = useForm<JobFormValues>({
+    resolver: zodResolver(jobFormSchema),
+    defaultValues: {
+      company: "",
+      role: "",
+      description: "",
+    },
+  });
+
+  const isSaving =
+    isSubmitting || createMutation.isPending || updateMutation.isPending;
 
   const resetForm = () => {
-    setCompany("");
-    setRole("");
-    setDescription("");
+    reset({
+      company: "",
+      role: "",
+      description: "",
+    });
+
     setEditingJobId(null);
   };
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    const trimmedCompany = company.trim();
-    const trimmedRole = role.trim();
-    const trimmedDescription = description.trim();
-
-    if (!trimmedCompany || !trimmedRole || trimmedDescription.length < 10) {
-      showToast(
-        "Enter a company, role, and description with at least 10 characters.",
-        "error",
-      );
-
-      return;
-    }
-
-    const input = {
-      company: trimmedCompany,
-      role: trimmedRole,
-      description: trimmedDescription,
-    };
-
+  const onSubmit = async (values: JobFormValues) => {
     try {
       if (editingJobId) {
         await updateMutation.mutateAsync({
           jobId: editingJobId,
-          input,
+          input: values,
         });
 
         showToast("Job updated successfully.", "success");
       } else {
-        await createMutation.mutateAsync(input);
+        await createMutation.mutateAsync(values);
 
         showToast("Job saved successfully.", "success");
       }
@@ -97,18 +115,17 @@ export const JobsPage = () => {
 
   const handleEdit = (job: Job) => {
     setEditingJobId(job.id);
-    setCompany(job.company);
-    setRole(job.role);
-    setDescription(job.description);
+
+    reset({
+      company: job.company,
+      role: job.role,
+      description: job.description,
+    });
 
     window.scrollTo({
       top: 0,
       behavior: "smooth",
     });
-  };
-
-  const handleCancelEdit = () => {
-    resetForm();
   };
 
   const handleDeleteRequest = (jobId: string) => {
@@ -159,19 +176,26 @@ export const JobsPage = () => {
             </p>
           </div>
 
-          <form className="job-form" onSubmit={handleSubmit}>
+          <form
+            className="job-form"
+            onSubmit={handleSubmit(onSubmit)}
+            noValidate
+          >
             <div className="form-field">
               <label htmlFor="company">Company</label>
 
               <input
                 id="company"
                 type="text"
-                value={company}
-                onChange={(event) => setCompany(event.target.value)}
                 placeholder="Amazon"
                 disabled={isSaving}
-                required
+                aria-invalid={errors.company ? "true" : "false"}
+                {...register("company")}
               />
+
+              {errors.company && (
+                <p className="field-error">{errors.company.message}</p>
+              )}
             </div>
 
             <div className="form-field">
@@ -180,12 +204,15 @@ export const JobsPage = () => {
               <input
                 id="role"
                 type="text"
-                value={role}
-                onChange={(event) => setRole(event.target.value)}
                 placeholder="Software Developer"
                 disabled={isSaving}
-                required
+                aria-invalid={errors.role ? "true" : "false"}
+                {...register("role")}
               />
+
+              {errors.role && (
+                <p className="field-error">{errors.role.message}</p>
+              )}
             </div>
 
             <div className="form-field">
@@ -193,13 +220,16 @@ export const JobsPage = () => {
 
               <textarea
                 id="description"
-                value={description}
-                onChange={(event) => setDescription(event.target.value)}
                 placeholder="Paste the complete job description..."
                 rows={8}
                 disabled={isSaving}
-                required
+                aria-invalid={errors.description ? "true" : "false"}
+                {...register("description")}
               />
+
+              {errors.description && (
+                <p className="field-error">{errors.description.message}</p>
+              )}
             </div>
 
             <div className="job-form-actions">
@@ -215,10 +245,21 @@ export const JobsPage = () => {
                 <button
                   type="button"
                   className="modal-cancel-button"
-                  onClick={handleCancelEdit}
+                  onClick={resetForm}
                   disabled={isSaving}
                 >
                   Cancel editing
+                </button>
+              )}
+
+              {!editingJobId && isDirty && (
+                <button
+                  type="button"
+                  className="modal-cancel-button"
+                  onClick={resetForm}
+                  disabled={isSaving}
+                >
+                  Clear form
                 </button>
               )}
             </div>
