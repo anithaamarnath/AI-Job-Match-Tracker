@@ -1,64 +1,24 @@
 import { Link } from "react-router-dom";
+import axios from "axios";
 
 import { AppShell } from "../components/AppShell";
 import { ErrorState } from "../components/ErrorState";
 import { LoadingState } from "../components/LoadingState";
 
-import { useJobs } from "../hooks/useJobs";
-import { useMatches } from "../hooks/useMatches";
-import { useResumes } from "../hooks/useResume";
+import { useDashboard } from "../hooks/useDashboard";
+
+const getErrorMessage = (error: unknown): string => {
+  if (axios.isAxiosError(error)) {
+    return (
+      error.response?.data?.message ?? "The dashboard could not be loaded."
+    );
+  }
+
+  return "An unexpected error occurred.";
+};
 
 export const DashboardPage = () => {
-  const resumesQuery = useResumes();
-  const jobsQuery = useJobs();
-  const matchesQuery = useMatches();
-
-  const isLoading =
-    resumesQuery.isPending || jobsQuery.isPending || matchesQuery.isPending;
-
-  const isError =
-    resumesQuery.isError || jobsQuery.isError || matchesQuery.isError;
-
-  if (isLoading) {
-    return (
-      <AppShell>
-        <main className="page-container">
-          <LoadingState message="Loading dashboard..." />
-        </main>
-      </AppShell>
-    );
-  }
-
-  if (isError) {
-    return (
-      <AppShell>
-        <main className="page-container">
-          <ErrorState
-            message="Unable to load dashboard data."
-            onRetry={() => {
-              void resumesQuery.refetch();
-              void jobsQuery.refetch();
-              void matchesQuery.refetch();
-            }}
-          />
-        </main>
-      </AppShell>
-    );
-  }
-
-  const resumes = resumesQuery.data ?? [];
-  const jobs = jobsQuery.data ?? [];
-  const matches = matchesQuery.data ?? [];
-
-  const averageMatchScore =
-    matches.length === 0
-      ? 0
-      : Math.round(
-          matches.reduce((total, match) => total + match.matchScore, 0) /
-            matches.length,
-        );
-
-  const recentMatches = matches.slice(0, 4);
+  const dashboardQuery = useDashboard();
 
   const storedUser = localStorage.getItem("user");
 
@@ -68,78 +28,146 @@ export const DashboardPage = () => {
       })
     : null;
 
+  if (dashboardQuery.isPending) {
+    return (
+      <AppShell>
+        <main className="page-container">
+          <LoadingState message="Loading dashboard..." />
+        </main>
+      </AppShell>
+    );
+  }
+
+  if (dashboardQuery.isError || !dashboardQuery.data) {
+    return (
+      <AppShell>
+        <main className="page-container">
+          <ErrorState
+            message={getErrorMessage(dashboardQuery.error)}
+            onRetry={() => {
+              void dashboardQuery.refetch();
+            }}
+          />
+        </main>
+      </AppShell>
+    );
+  }
+
+  const dashboard = dashboardQuery.data;
+
   return (
     <AppShell>
       <main className="page-container">
-        <header className="page-header dashboard-header">
-          <div>
-            <p className="page-eyebrow">Career dashboard</p>
+        <header className="page-header">
+          <p className="page-eyebrow">Career dashboard</p>
 
-            <h1>Welcome back, {user?.name ?? "User"}</h1>
+          <h1>Welcome back, {user?.name ?? "User"}</h1>
 
-            <p>Review your resumes, saved jobs, and recent match results.</p>
-          </div>
+          <p>Track your resumes, saved jobs, and strongest job match.</p>
         </header>
 
         <section className="dashboard-stats">
           <article className="stat-card">
             <p>Total resumes</p>
-            <strong>{resumes.length}</strong>
+            <strong>{dashboard.totalResumes}</strong>
+
             <Link to="/resumes">Manage resumes</Link>
           </article>
 
           <article className="stat-card">
             <p>Saved jobs</p>
-            <strong>{jobs.length}</strong>
+            <strong>{dashboard.totalJobs}</strong>
+
             <Link to="/jobs">Manage jobs</Link>
           </article>
 
           <article className="stat-card">
             <p>Total matches</p>
-            <strong>{matches.length}</strong>
-            <Link to="/matches">View matches</Link>
-          </article>
+            <strong>{dashboard.totalMatches}</strong>
 
-          <article className="stat-card">
-            <p>Average match score</p>
-            <strong>{averageMatchScore}%</strong>
-            <Link to="/matches">Run a new match</Link>
+            <Link to="/matches">View matches</Link>
           </article>
         </section>
 
         <section className="dashboard-grid">
           <article className="dashboard-panel">
             <div className="section-heading">
-              <h2>Recent matches</h2>
+              <h2>Latest resume</h2>
+
+              <Link to="/resumes">View all</Link>
+            </div>
+
+            {dashboard.latestResume ? (
+              <div className="dashboard-highlight">
+                <div>
+                  <p className="card-eyebrow">Most recently uploaded</p>
+
+                  <h3>{dashboard.latestResume.originalName}</h3>
+
+                  <p>
+                    Uploaded{" "}
+                    {new Intl.DateTimeFormat("en-CA", {
+                      dateStyle: "medium",
+                    }).format(new Date(dashboard.latestResume.createdAt))}
+                  </p>
+                </div>
+
+                <div className="dashboard-score">
+                  <strong>{dashboard.latestResume.atsScore ?? "—"}</strong>
+
+                  <span>ATS score</span>
+                </div>
+              </div>
+            ) : (
+              <div className="dashboard-empty">
+                <p>No resumes uploaded yet.</p>
+
+                <Link className="dashboard-action-link" to="/resumes">
+                  Upload a resume
+                </Link>
+              </div>
+            )}
+          </article>
+
+          <article className="dashboard-panel">
+            <div className="section-heading">
+              <h2>Best match</h2>
 
               <Link to="/matches">View all</Link>
             </div>
 
-            {recentMatches.length === 0 ? (
+            {dashboard.bestMatch ? (
+              <div className="dashboard-highlight">
+                <div>
+                  <p className="card-eyebrow">Strongest comparison</p>
+
+                  <h3>
+                    {dashboard.bestMatch.job.company} —{" "}
+                    {dashboard.bestMatch.job.role}
+                  </h3>
+
+                  <p>Resume: {dashboard.bestMatch.resume.originalName}</p>
+
+                  <span
+                    className={`confidence-badge confidence-${dashboard.bestMatch.confidence.toLowerCase()}`}
+                  >
+                    {dashboard.bestMatch.confidence} confidence
+                  </span>
+                </div>
+
+                <div className="dashboard-score">
+                  <strong>{dashboard.bestMatch.matchScore}%</strong>
+
+                  <span>Match score</span>
+                </div>
+              </div>
+            ) : (
               <div className="dashboard-empty">
                 <p>No match results yet.</p>
 
                 <Link className="dashboard-action-link" to="/matches">
                   Run your first match
                 </Link>
-              </div>
-            ) : (
-              <div className="recent-match-list">
-                {recentMatches.map((match) => (
-                  <article key={match.id} className="recent-match-item">
-                    <div>
-                      <strong>{match.matchScore}% match</strong>
-
-                      <p>Confidence: {match.confidence}</p>
-                    </div>
-
-                    <div className="recent-match-meta">
-                      <span>{match.matchingSkills.length} matched skills</span>
-
-                      <span>{match.missingSkills.length} missing skills</span>
-                    </div>
-                  </article>
-                ))}
               </div>
             )}
           </article>
@@ -154,7 +182,7 @@ export const DashboardPage = () => {
 
             <Link className="quick-action-card" to="/jobs">
               <strong>Save job</strong>
-              <span>Store a job description for matching.</span>
+              <span>Store a job description.</span>
             </Link>
 
             <Link className="quick-action-card" to="/matches">
