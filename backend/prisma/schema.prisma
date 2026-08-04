@@ -1,19 +1,116 @@
 generator client {
-    provider     = "prisma-client"
-    output       = "../src/generated/prisma"
-    moduleFormat = "esm"
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "esm"
 }
 
 datasource db {
-    provider = "postgresql"
+  provider = "postgresql"
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  jobs             Job[]
+  jobMatches       JobMatch[]
+  resumes          Resume[]
+  resumeJobMatches ResumeJobMatch[]
 }
 
 model Job {
-    id          String   @id @default(cuid())
-    company     String
-    role        String
-    description String
-    status      String   @default("SAVED")
-    createdAt   DateTime @default(now())
-    updatedAt   DateTime @updatedAt
+  id          String   @id @default(cuid())
+  company     String
+  role        String
+  description String
+  status      String   @default("SAVED")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userId           String
+  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  resumeJobMatches ResumeJobMatch[]
+}
+
+model JobMatch {
+  id              String   @id @default(cuid())
+  resume          String
+  jobDescription  String
+  matchScore      Int
+  matchedSkills   String[]
+  missingSkills   String[]
+  recommendations String[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Resume {
+  id            String @id @default(cuid())
+  originalName  String
+  storedName    String
+  filePath      String
+  extractedText String @db.Text
+
+  atsScore        Int?
+  detectedSkills  String[]  @default([])
+  strengths       String[]  @default([])
+  recommendations String[]  @default([])
+  analyzedAt      DateTime?
+
+  aiProvider            String?
+  aiProfessionalSummary String?   @db.Text
+  aiStrengths           String[]  @default([])
+  aiWeaknesses          String[]  @default([])
+  aiMissingKeywords     String[]  @default([])
+  aiImprovedSummary     String?   @db.Text
+  aiRecommendations     String[]  @default([])
+  aiAtsScore            Int?
+  aiAnalyzedAt          DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId           String
+  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  resumeJobMatches ResumeJobMatch[]
+
+  @@index([userId])
+}
+
+model ResumeJobMatch {
+  id         String @id @default(cuid())
+  matchScore Int
+  confidence String @default("LOW")
+
+  resumeSkills     String[] @default([])
+  jobSkills        String[] @default([])
+  matchingSkills   String[] @default([])
+  missingSkills    String[] @default([])
+  additionalSkills String[] @default([])
+  recommendations  String[] @default([])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  resumeId String
+  resume   Resume @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+
+  jobId String
+  job   Job    @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([resumeId])
+  @@index([jobId])
 }

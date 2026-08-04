@@ -1,30 +1,71 @@
-import type { NextFunction, Request, Response } from "express";
-import { AppError } from "../utils/AppError";
-import { logger } from "../utils/logger";
+import type {
+  ErrorRequestHandler,
+  NextFunction,
+  Request,
+  Response,
+} from "express";
 
-export const errorHandler = (
-  error: Error,
-  req: Request,
+import multer from "multer";
+
+import { AppError } from "../utils/AppError.js";
+
+interface BodyParserError extends SyntaxError {
+  status?: number;
+  type?: string;
+}
+
+export const errorHandler: ErrorRequestHandler = (
+  error: unknown,
+  _req: Request,
   res: Response,
-  next: NextFunction
-): Response => {
-  if (error instanceof AppError) {
-    logger.warn(`${error.statusCode} - ${error.message}`);
+  _next: NextFunction
+): void => {
+  if (error instanceof multer.MulterError) {
+    if (error.code === "LIMIT_FILE_SIZE") {
+      res.status(400).json({
+        success: false,
+        message: "Resume file must be smaller than 5 MB",
+      });
 
-    return res.status(error.statusCode).json({
+      return;
+    }
+
+    res.status(400).json({
       success: false,
-      message: error.message
+      message: error.message,
     });
+
+    return;
   }
 
-  logger.error(error.message, {
-    stack: error.stack,
-    method: req.method,
-    path: req.originalUrl
-  });
+  if (error instanceof AppError) {
+    res.status(error.statusCode).json({
+      success: false,
+      message: error.message,
+    });
 
-  return res.status(500).json({
+    return;
+  }
+
+  const bodyParserError = error as BodyParserError;
+
+  if (
+    bodyParserError instanceof SyntaxError &&
+    bodyParserError.status === 400 &&
+    bodyParserError.type === "entity.parse.failed"
+  ) {
+    res.status(400).json({
+      success: false,
+      message: "Invalid JSON body",
+    });
+
+    return;
+  }
+
+  console.error(error);
+
+  res.status(500).json({
     success: false,
-    message: "Internal server error"
+    message: "Internal server error",
   });
 };

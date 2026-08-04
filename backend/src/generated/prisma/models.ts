@@ -8,5 +8,9 @@
  *
  * 🟢 You can import this file directly.
  */
+export type * from './models/User.js'
 export type * from './models/Job.js'
+export type * from './models/JobMatch.js'
+export type * from './models/Resume.js'
+export type * from './models/ResumeJobMatch.js'
 export type * from './commonInputTypes.js'

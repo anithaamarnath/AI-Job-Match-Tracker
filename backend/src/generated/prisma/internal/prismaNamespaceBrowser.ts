@@ -51,7 +51,11 @@ export const AnyNull = runtime.AnyNull
 
 
 export const ModelName = {
-  Job: 'Job'
+  User: 'User',
+  Job: 'Job',
+  JobMatch: 'JobMatch',
+  Resume: 'Resume',
+  ResumeJobMatch: 'ResumeJobMatch'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -70,6 +74,18 @@ export const TransactionIsolationLevel = runtime.makeStrictEnum({
 export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
 
 
+export const UserScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  email: 'email',
+  passwordHash: 'passwordHash',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
 export const JobScalarFieldEnum = {
   id: 'id',
   company: 'company',
@@ -77,10 +93,75 @@ export const JobScalarFieldEnum = {
   description: 'description',
   status: 'status',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  userId: 'userId'
 } as const
 
 export type JobScalarFieldEnum = (typeof JobScalarFieldEnum)[keyof typeof JobScalarFieldEnum]
+
+
+export const JobMatchScalarFieldEnum = {
+  id: 'id',
+  resume: 'resume',
+  jobDescription: 'jobDescription',
+  matchScore: 'matchScore',
+  matchedSkills: 'matchedSkills',
+  missingSkills: 'missingSkills',
+  recommendations: 'recommendations',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  userId: 'userId'
+} as const
+
+export type JobMatchScalarFieldEnum = (typeof JobMatchScalarFieldEnum)[keyof typeof JobMatchScalarFieldEnum]
+
+
+export const ResumeScalarFieldEnum = {
+  id: 'id',
+  originalName: 'originalName',
+  storedName: 'storedName',
+  filePath: 'filePath',
+  extractedText: 'extractedText',
+  atsScore: 'atsScore',
+  detectedSkills: 'detectedSkills',
+  strengths: 'strengths',
+  recommendations: 'recommendations',
+  analyzedAt: 'analyzedAt',
+  aiProvider: 'aiProvider',
+  aiProfessionalSummary: 'aiProfessionalSummary',
+  aiStrengths: 'aiStrengths',
+  aiWeaknesses: 'aiWeaknesses',
+  aiMissingKeywords: 'aiMissingKeywords',
+  aiImprovedSummary: 'aiImprovedSummary',
+  aiRecommendations: 'aiRecommendations',
+  aiAtsScore: 'aiAtsScore',
+  aiAnalyzedAt: 'aiAnalyzedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  userId: 'userId'
+} as const
+
+export type ResumeScalarFieldEnum = (typeof ResumeScalarFieldEnum)[keyof typeof ResumeScalarFieldEnum]
+
+
+export const ResumeJobMatchScalarFieldEnum = {
+  id: 'id',
+  matchScore: 'matchScore',
+  confidence: 'confidence',
+  resumeSkills: 'resumeSkills',
+  jobSkills: 'jobSkills',
+  matchingSkills: 'matchingSkills',
+  missingSkills: 'missingSkills',
+  additionalSkills: 'additionalSkills',
+  recommendations: 'recommendations',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  userId: 'userId',
+  resumeId: 'resumeId',
+  jobId: 'jobId'
+} as const
+
+export type ResumeJobMatchScalarFieldEnum = (typeof ResumeJobMatchScalarFieldEnum)[keyof typeof ResumeJobMatchScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -97,4 +178,12 @@ export const QueryMode = {
 } as const
 
 export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
+
+
+export const NullsOrder = {
+  first: 'first',
+  last: 'last'
+} as const
+
+export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 
