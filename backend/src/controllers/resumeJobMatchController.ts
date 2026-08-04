@@ -4,14 +4,14 @@ import type {
   Response,
 } from "express";
 
-import { AppError } from "../utils/AppError.js";
-import { 
+import {
   calculateResumeJobMatch,
   deleteResumeJobMatchHistoryById,
-  getResumeJobMatchHistory,
+   getResumeJobMatchHistory as getResumeJobMatchHistoryService,
   getResumeJobMatchHistoryById,
- } from "../services/resumeJobMatchService.js";
+} from "../services/resumeJobMatchService.js";
 
+import { AppError } from "../utils/AppError.js";
 
 export const createResumeJobMatch = async (
   req: Request,
@@ -22,37 +22,26 @@ export const createResumeJobMatch = async (
     const userId = req.user?.id;
 
     if (!userId) {
-      throw new AppError(
-        "User is not authenticated",
-        401
-      );
+      throw new AppError("User is not authenticated", 401);
     }
 
-    const { resumeId, jobId } = req.body;
+    const result = await calculateResumeJobMatch(
+      userId,
+      req.body.resumeId,
+      req.body.jobId
+    );
 
-    const result =
-      await calculateResumeJobMatch(
-        userId,
-        resumeId,
-        jobId
-      );
-
-    res.status(200).json({
+    res.status(201).json({
       success: true,
-      message:
-        "Resume and job matched successfully",
-      data: {
-        resumeId,
-        jobId,
-        ...result,
-      },
+      message: "Resume-job match created successfully",
+      data: result,
     });
   } catch (error) {
     next(error);
   }
 };
 
-export const getResumeJobMatches = async (
+export const getResumeJobMatchHistory = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -61,19 +50,14 @@ export const getResumeJobMatches = async (
     const userId = req.user?.id;
 
     if (!userId) {
-      throw new AppError(
-        "User is not authenticated",
-        401
-      );
+      throw new AppError("User is not authenticated", 401);
     }
 
-    const matches =
-      await getResumeJobMatchHistory(userId);
+    const matches = await getResumeJobMatchHistoryService(userId);
 
     res.status(200).json({
       success: true,
-      message:
-        "Resume-job match history retrieved successfully",
+      message: "Resume-job match history retrieved successfully",
       data: matches,
     });
   } catch (error) {
@@ -81,7 +65,7 @@ export const getResumeJobMatches = async (
   }
 };
 
-export const getResumeJobMatch = async (
+export const getResumeJobMatchById = async (
   req: Request<{ id: string }>,
   res: Response,
   next: NextFunction
@@ -90,22 +74,17 @@ export const getResumeJobMatch = async (
     const userId = req.user?.id;
 
     if (!userId) {
-      throw new AppError(
-        "User is not authenticated",
-        401
-      );
+      throw new AppError("User is not authenticated", 401);
     }
 
-    const match =
-      await getResumeJobMatchHistoryById(
-        userId,
-        req.params.id
-      );
+    const match = await getResumeJobMatchHistoryById(
+      userId,
+      req.params.id
+    );
 
     res.status(200).json({
       success: true,
-      message:
-        "Resume-job match result retrieved successfully",
+      message: "Resume-job match retrieved successfully",
       data: match,
     });
   } catch (error) {
@@ -122,10 +101,7 @@ export const deleteResumeJobMatch = async (
     const userId = req.user?.id;
 
     if (!userId) {
-      throw new AppError(
-        "User is not authenticated",
-        401
-      );
+      throw new AppError("User is not authenticated", 401);
     }
 
     await deleteResumeJobMatchHistoryById(
@@ -135,8 +111,7 @@ export const deleteResumeJobMatch = async (
 
     res.status(200).json({
       success: true,
-      message:
-        "Resume-job match result deleted successfully",
+      message: "Resume-job match deleted successfully",
     });
   } catch (error) {
     next(error);

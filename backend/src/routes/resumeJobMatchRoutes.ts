@@ -3,8 +3,8 @@ import { Router } from "express";
 import {
   createResumeJobMatch,
   deleteResumeJobMatch,
-  getResumeJobMatch,
-  getResumeJobMatches,
+  getResumeJobMatchById,
+  getResumeJobMatchHistory,
 } from "../controllers/resumeJobMatchController.js";
 
 import { authenticate } from "../middleware/authMiddleware.js";
@@ -15,14 +15,15 @@ const router = Router();
 
 router.use(authenticate);
 
-router.get("/", getResumeJobMatches);
-router.get("/:id", getResumeJobMatch);
-
 router.post(
   "/",
   validateRequest(createResumeJobMatchSchema),
   createResumeJobMatch
 );
+
+router.get("/", getResumeJobMatchHistory);
+
+router.get("/:id", getResumeJobMatchById);
 
 router.delete("/:id", deleteResumeJobMatch);
 

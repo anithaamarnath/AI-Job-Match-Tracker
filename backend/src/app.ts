@@ -11,7 +11,7 @@ import resumeRoutes from "./routes/resumeRoutes.js";
 import resumeJobMatchRoutes from "./routes/resumeJobMatchRoutes.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
 
-const app = express();
+export const app = express();
 
 app.use(cors());
 app.use(express.json());
