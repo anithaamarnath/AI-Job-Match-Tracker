@@ -8,11 +8,17 @@
 *.log
 
 # Environment files
+backend/.env
+frontend/.env
 .env
 .env.local
 
 # OS files
 Thumbs.db
+
+backend/uploads/
+frontend/dist/
+backend/dist/
 
 node_modules/
 

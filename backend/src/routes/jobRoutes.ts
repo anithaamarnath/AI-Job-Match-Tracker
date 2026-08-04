@@ -8,6 +8,8 @@ import {
   updateJob,
 } from "../controllers/jobController.js";
 
+import type { JobParams } from "../controllers/jobController.js";
+
 import { authenticate } from "../middleware/authMiddleware.js";
 import { validateRequest } from "../middleware/validateRequest.js";
 
@@ -21,7 +23,11 @@ const router = Router();
 router.use(authenticate);
 
 router.get("/", getJobs);
-router.get("/:id", getJobById);
+
+router.get<JobParams>(
+  "/:id",
+  getJobById
+);
 
 router.post(
   "/",
@@ -29,12 +35,15 @@ router.post(
   createJob
 );
 
-router.patch(
+router.patch<JobParams>(
   "/:id",
   validateRequest(updateJobSchema),
   updateJob
 );
 
-router.delete("/:id", deleteJob);
+router.delete<JobParams>(
+  "/:id",
+  deleteJob
+);
 
 export default router;
