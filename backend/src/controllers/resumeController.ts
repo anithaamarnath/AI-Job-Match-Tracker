@@ -1,25 +1,53 @@
+import path from "node:path";
+
 import type {
   NextFunction,
   Request,
   Response,
 } from "express";
+
+import type {
+  ParamsDictionary,
+} from "express-serve-static-core";
+
 import {
   analyzeSavedResume,
-  getSavedResumeAnalysis,
   deleteResumeHistoryById,
+  generateAIResumeAnalysis,
   getResumeHistory,
   getResumeHistoryById,
+  getSavedAIResumeAnalysis,
+  getSavedResumeAnalysis,
   saveUploadedResume,
 } from "../services/resumeService.js";
-import {
-  generateAIResumeAnalysis,
-  getSavedAIResumeAnalysis
-} from "../services/resumeService.js";
-import path from "node:path";
-
 
 import { AppError } from "../utils/AppError.js";
 
+export interface ResumeParams
+  extends ParamsDictionary {
+  id: string;
+}
+
+interface RequestWithUser {
+  user?: {
+    id?: string;
+  };
+}
+
+const getAuthenticatedUserId = (
+  req: RequestWithUser
+): string => {
+  const userId = req.user?.id;
+
+  if (!userId) {
+    throw new AppError(
+      "User is not authenticated",
+      401
+    );
+  }
+
+  return userId;
+};
 
 export const uploadResumeFile = async (
   req: Request,
@@ -27,26 +55,29 @@ export const uploadResumeFile = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const userId = req.user?.id;
-
-    if (!userId) {
-      throw new AppError("User is not authenticated", 401);
-    }
+    const userId =
+      getAuthenticatedUserId(req);
 
     if (!req.file) {
-      throw new AppError("Resume file is required", 400);
+      throw new AppError(
+        "Resume file is required",
+        400
+      );
     }
 
-    const savedResume = await saveUploadedResume({
-      userId,
-      originalName: req.file.originalname,
-      storedName: req.file.filename,
-      filePath: req.file.path,
-    });
+    const savedResume =
+      await saveUploadedResume({
+        userId,
+        originalName:
+          req.file.originalname,
+        storedName: req.file.filename,
+        filePath: req.file.path,
+      });
 
     res.status(201).json({
       success: true,
-      message: "Resume uploaded and saved successfully",
+      message:
+        "Resume uploaded and saved successfully",
       data: savedResume,
     });
   } catch (error) {
@@ -60,17 +91,16 @@ export const getResumes = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    if (!req.user?.id) {
-      throw new AppError("Unauthorized", 401);
-    }
+    const userId =
+      getAuthenticatedUserId(req);
 
-    const resumes = await getResumeHistory(
-      req.user.id
-    );
+    const resumes =
+      await getResumeHistory(userId);
 
     res.status(200).json({
       success: true,
-      message: "Resumes retrieved successfully",
+      message:
+        "Resumes retrieved successfully",
       data: resumes,
     });
   } catch (error) {
@@ -79,32 +109,24 @@ export const getResumes = async (
 };
 
 export const getResume = async (
-  req: Request,
+  req: Request<ResumeParams>,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
-    if (!req.user?.id) {
-      throw new AppError("Unauthorized", 401);
-    }
+    const userId =
+      getAuthenticatedUserId(req);
 
-    const resumeId = req.params.id;
-
-    if (!resumeId) {
-      throw new AppError(
-        "Resume ID is required",
-        400
+    const resume =
+      await getResumeHistoryById(
+        userId,
+        req.params.id
       );
-    }
-
-    const resume = await getResumeHistoryById(
-      req.user.id,
-      resumeId
-    );
 
     res.status(200).json({
       success: true,
-      message: "Resume retrieved successfully",
+      message:
+        "Resume retrieved successfully",
       data: resume,
     });
   } catch (error) {
@@ -113,32 +135,23 @@ export const getResume = async (
 };
 
 export const deleteResume = async (
-  req: Request,
+  req: Request<ResumeParams>,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
-    if (!req.user?.id) {
-      throw new AppError("Unauthorized", 401);
-    }
-
-    const resumeId = req.params.id;
-
-    if (!resumeId) {
-      throw new AppError(
-        "Resume ID is required",
-        400
-      );
-    }
+    const userId =
+      getAuthenticatedUserId(req);
 
     await deleteResumeHistoryById(
-      req.user.id,
-      resumeId
+      userId,
+      req.params.id
     );
 
     res.status(200).json({
       success: true,
-      message: "Resume deleted successfully",
+      message:
+        "Resume deleted successfully",
     });
   } catch (error) {
     next(error);
@@ -146,36 +159,24 @@ export const deleteResume = async (
 };
 
 export const analyzeResume = async (
-  req: Request,
+  req: Request<ResumeParams>,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
-    const userId = req.user?.id;
-    const resumeId = req.params.id;
+    const userId =
+      getAuthenticatedUserId(req);
 
-    if (!userId) {
-      throw new AppError(
-        "User is not authenticated",
-        401
+    const analysis =
+      await analyzeSavedResume(
+        userId,
+        req.params.id
       );
-    }
-
-    if (!resumeId) {
-      throw new AppError(
-        "Resume ID is required",
-        400
-      );
-    }
-
-    const analysis = await analyzeSavedResume(
-      userId,
-      resumeId
-    );
 
     res.status(200).json({
       success: true,
-      message: "Resume analyzed successfully",
+      message:
+        "Resume analyzed successfully",
       data: analysis,
     });
   } catch (error) {
@@ -184,36 +185,24 @@ export const analyzeResume = async (
 };
 
 export const getResumeAnalysis = async (
-  req: Request,
+  req: Request<ResumeParams>,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
-    const userId = req.user?.id;
-    const resumeId = req.params.id;
+    const userId =
+      getAuthenticatedUserId(req);
 
-    if (!userId) {
-      throw new AppError(
-        "User is not authenticated",
-        401
+    const analysis =
+      await getSavedResumeAnalysis(
+        userId,
+        req.params.id
       );
-    }
-
-    if (!resumeId) {
-      throw new AppError(
-        "Resume ID is required",
-        400
-      );
-    }
-
-    const analysis = await getSavedResumeAnalysis(
-      userId,
-      resumeId
-    );
 
     res.status(200).json({
       success: true,
-      message: "Saved resume analysis retrieved successfully",
+      message:
+        "Saved resume analysis retrieved successfully",
       data: analysis,
     });
   } catch (error) {
@@ -222,57 +211,50 @@ export const getResumeAnalysis = async (
 };
 
 export const analyzeResumeWithAI = async (
-  req: Request<{ id: string }>,
+  req: Request<ResumeParams>,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
-    const userId = req.user?.id;
+    const userId =
+      getAuthenticatedUserId(req);
 
-    if (!userId) {
-      throw new AppError(
-        "User is not authenticated",
-        401
+    const result =
+      await generateAIResumeAnalysis(
+        userId,
+        req.params.id
       );
-    }
-
-    const result = await generateAIResumeAnalysis(
-      userId,
-      req.params.id
-    );
 
     res.status(200).json({
       success: true,
-      message: "AI resume analysis completed",
+      message:
+        "AI resume analysis completed",
       data: result,
     });
   } catch (error) {
     next(error);
   }
 };
+
 export const getAIResumeAnalysis = async (
-  req: Request<{ id: string }>,
+  req: Request<ResumeParams>,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
-    const userId = req.user?.id;
+    const userId =
+      getAuthenticatedUserId(req);
 
-    if (!userId) {
-      throw new AppError(
-        "User is not authenticated",
-        401
+    const result =
+      await getSavedAIResumeAnalysis(
+        userId,
+        req.params.id
       );
-    }
-
-    const result = await getSavedAIResumeAnalysis(
-      userId,
-      req.params.id
-    );
 
     res.status(200).json({
       success: true,
-      message: "Saved AI resume analysis retrieved",
+      message:
+        "Saved AI resume analysis retrieved",
       data: result,
     });
   } catch (error) {
@@ -281,31 +263,31 @@ export const getAIResumeAnalysis = async (
 };
 
 export const previewResumeFile = async (
-  req: Request<{ id: string }>,
+  req: Request<ResumeParams>,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
-    const userId = req.user?.id;
+    const userId =
+      getAuthenticatedUserId(req);
 
-    if (!userId) {
-      throw new AppError("User is not authenticated", 401);
-    }
+    const resume =
+      await getResumeHistoryById(
+        userId,
+        req.params.id
+      );
 
-    const resume = await getResumeHistoryById(
-      userId,
-      req.params.id
-    );
+    const absoluteFilePath =
+      path.resolve(resume.filePath);
 
-    const absoluteFilePath = path.resolve(
-      resume.filePath
-    );
-
-    res.sendFile(absoluteFilePath, (error) => {
-      if (error) {
-        next(error);
+    res.sendFile(
+      absoluteFilePath,
+      (error) => {
+        if (error) {
+          next(error);
+        }
       }
-    });
+    );
   } catch (error) {
     next(error);
   }

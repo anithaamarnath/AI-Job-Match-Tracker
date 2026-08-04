@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getFeatures } from "../controllers/featureController";
+import { getFeatures } from "../controllers/featureController.js";
 
 const router = Router();
 

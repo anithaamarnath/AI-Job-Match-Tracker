@@ -62,18 +62,18 @@ describe("Job API validation", () => {
     }
   });
 
-  const createJob = (
-    body: unknown,
-    token = accessToken
-  ) => {
-    return request(app)
-      .post("/api/jobs")
-      .set(
-        "Authorization",
-        `Bearer ${token}`
-      )
-      .send(body);
-  };
+const createJob = (
+  body: Record<string, unknown>,
+  token = accessToken
+) => {
+  return request(app)
+    .post("/api/jobs")
+    .set(
+      "Authorization",
+      `Bearer ${token}`
+    )
+    .send(body);
+};
 
   it("rejects a request without authentication", async () => {
     const response = await request(app)
