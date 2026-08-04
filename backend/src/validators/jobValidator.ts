@@ -2,24 +2,62 @@ import { z } from "zod";
 
 export const createJobSchema = z.object({
   company: z
-    .string()
-    .min(1, "Company name is required"),
+    .string({
+      message: "Company must be a string",
+    })
+    .trim()
+    .min(
+      2,
+      "Company must contain at least 2 characters"
+    )
+    .max(
+      100,
+      "Company must be 100 characters or fewer"
+    ),
 
   role: z
-    .string()
-    .min(1, "Role is required"),
+    .string({
+      message: "Role must be a string",
+    })
+    .trim()
+    .min(
+      2,
+      "Role must contain at least 2 characters"
+    )
+    .max(
+      120,
+      "Role must be 120 characters or fewer"
+    ),
 
   description: z
-    .string()
-    .min(10, "Description must contain at least 10 characters"),
+    .string({
+      message: "Description must be a string",
+    })
+    .trim()
+    .min(
+      10,
+      "Description must contain at least 10 characters"
+    )
+    .max(
+      20_000,
+      "Description must be 20,000 characters or fewer"
+    ),
 });
 
-export type CreateJobInput = z.infer<typeof createJobSchema>;
+export type CreateJobInput = z.infer<
+  typeof createJobSchema
+>;
 
 export const updateJobSchema = createJobSchema
   .partial()
   .extend({
-    status: z.string().min(1, "Status cannot be empty").optional(),
+    status: z
+      .string({
+        message: "Status must be a string",
+      })
+      .trim()
+      .min(1, "Status cannot be empty")
+      .optional(),
   })
   .refine(
     (data) => Object.keys(data).length > 0,
