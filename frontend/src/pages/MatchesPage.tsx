@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 
 import { AppShell } from "../components/AppShell";
@@ -8,6 +8,12 @@ import { LoadingState } from "../components/LoadingState";
 import { useJobs } from "../hooks/useJobs";
 import { useCreateResumeJobMatch, useMatches } from "../hooks/useMatches";
 import { useResumes } from "../hooks/useResume";
+
+type ConfidenceFilter = "ALL" | "LOW" | "MEDIUM" | "HIGH";
+
+type ScoreFilter = "ALL" | "EXCELLENT" | "GOOD" | "AVERAGE" | "LOW";
+
+type MatchSortOption = "NEWEST" | "OLDEST" | "HIGHEST_SCORE" | "LOWEST_SCORE";
 
 const getErrorMessage = (error: unknown): string => {
   if (axios.isAxiosError(error)) {
@@ -23,17 +29,35 @@ export const MatchesPage = () => {
   const resumesQuery = useResumes();
   const jobsQuery = useJobs();
   const matchesQuery = useMatches();
+  const ITEMS_PER_PAGE = 5;
+
   const createMatchMutation = useCreateResumeJobMatch();
 
   const [resumeId, setResumeId] = useState("");
   const [jobId, setJobId] = useState("");
   const [message, setMessage] = useState("");
 
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const [confidenceFilter, setConfidenceFilter] =
+    useState<ConfidenceFilter>("ALL");
+
+  const [scoreFilter, setScoreFilter] = useState<ScoreFilter>("ALL");
+
+  const [sortOption, setSortOption] = useState<MatchSortOption>("NEWEST");
+
+  const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, confidenceFilter, scoreFilter, sortOption]);
+
   const handleMatch = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (!resumeId || !jobId) {
       setMessage("Select both a resume and a job.");
+
       return;
     }
 
@@ -56,6 +80,99 @@ export const MatchesPage = () => {
   const isError = resumesQuery.isError || jobsQuery.isError;
 
   const latestResult = createMatchMutation.data;
+
+  const filteredMatches = useMemo(() => {
+    const matches = matchesQuery.data ?? [];
+
+    const normalizedSearch = searchTerm.trim().toLowerCase();
+
+    const filtered = matches.filter((match) => {
+      const resumeName = match.resume?.originalName?.toLowerCase() ?? "";
+
+      const company = match.job?.company?.toLowerCase() ?? "";
+
+      const role = match.job?.role?.toLowerCase() ?? "";
+
+      const matchesSearch =
+        !normalizedSearch ||
+        resumeName.includes(normalizedSearch) ||
+        company.includes(normalizedSearch) ||
+        role.includes(normalizedSearch);
+
+      const matchesConfidence =
+        confidenceFilter === "ALL" || match.confidence === confidenceFilter;
+
+      const matchesScore = (() => {
+        switch (scoreFilter) {
+          case "EXCELLENT":
+            return match.matchScore >= 90;
+
+          case "GOOD":
+            return match.matchScore >= 70 && match.matchScore < 90;
+
+          case "AVERAGE":
+            return match.matchScore >= 50 && match.matchScore < 70;
+
+          case "LOW":
+            return match.matchScore < 50;
+
+          case "ALL":
+          default:
+            return true;
+        }
+      })();
+
+      return matchesSearch && matchesConfidence && matchesScore;
+    });
+
+    return [...filtered].sort((first, second) => {
+      switch (sortOption) {
+        case "OLDEST":
+          return (
+            new Date(first.createdAt ?? 0).getTime() -
+            new Date(second.createdAt ?? 0).getTime()
+          );
+
+        case "HIGHEST_SCORE":
+          return second.matchScore - first.matchScore;
+
+        case "LOWEST_SCORE":
+          return first.matchScore - second.matchScore;
+
+        case "NEWEST":
+        default:
+          return (
+            new Date(second.createdAt ?? 0).getTime() -
+            new Date(first.createdAt ?? 0).getTime()
+          );
+      }
+    });
+  }, [
+    matchesQuery.data,
+    searchTerm,
+    confidenceFilter,
+    scoreFilter,
+    sortOption,
+  ]);
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredMatches.length / ITEMS_PER_PAGE),
+  );
+
+  const safeCurrentPage = Math.min(currentPage, totalPages);
+
+  const paginatedMatches = useMemo(() => {
+    const startIndex = (safeCurrentPage - 1) * ITEMS_PER_PAGE;
+
+    return filteredMatches.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [filteredMatches, safeCurrentPage]);
+
+  const clearMatchFilters = () => {
+    setSearchTerm("");
+    setConfidenceFilter("ALL");
+    setScoreFilter("ALL");
+    setSortOption("NEWEST");
+  };
 
   return (
     <AppShell>
@@ -211,8 +328,97 @@ export const MatchesPage = () => {
               <h2>Recent match reports</h2>
             </div>
 
-            <span>{matchesQuery.data?.length ?? 0} total</span>
+            <span>
+              {filteredMatches.length === 0
+                ? "0 results"
+                : `${(safeCurrentPage - 1) * ITEMS_PER_PAGE + 1}–${Math.min(
+                    safeCurrentPage * ITEMS_PER_PAGE,
+                    filteredMatches.length,
+                  )} of ${filteredMatches.length}`}
+            </span>
           </div>
+
+          <section className="list-controls-panel">
+            <div className="list-controls match-list-controls">
+              <div className="form-field search-field">
+                <label htmlFor="match-search">Search comparisons</label>
+
+                <input
+                  id="match-search"
+                  type="search"
+                  value={searchTerm}
+                  onChange={(event) => setSearchTerm(event.target.value)}
+                  placeholder="Search resume, company, or role..."
+                />
+              </div>
+
+              <div className="form-field">
+                <label htmlFor="confidence-filter">Confidence</label>
+
+                <select
+                  id="confidence-filter"
+                  value={confidenceFilter}
+                  onChange={(event) =>
+                    setConfidenceFilter(event.target.value as ConfidenceFilter)
+                  }
+                >
+                  <option value="ALL">All confidence</option>
+                  <option value="HIGH">High</option>
+                  <option value="MEDIUM">Medium</option>
+                  <option value="LOW">Low</option>
+                </select>
+              </div>
+
+              <div className="form-field">
+                <label htmlFor="score-filter">Match score</label>
+
+                <select
+                  id="score-filter"
+                  value={scoreFilter}
+                  onChange={(event) =>
+                    setScoreFilter(event.target.value as ScoreFilter)
+                  }
+                >
+                  <option value="ALL">All scores</option>
+                  <option value="EXCELLENT">Excellent: 90–100</option>
+                  <option value="GOOD">Good: 70–89</option>
+                  <option value="AVERAGE">Average: 50–69</option>
+                  <option value="LOW">Low: below 50</option>
+                </select>
+              </div>
+
+              <div className="form-field">
+                <label htmlFor="match-sort">Sort by</label>
+
+                <select
+                  id="match-sort"
+                  value={sortOption}
+                  onChange={(event) =>
+                    setSortOption(event.target.value as MatchSortOption)
+                  }
+                >
+                  <option value="NEWEST">Newest first</option>
+                  <option value="OLDEST">Oldest first</option>
+                  <option value="HIGHEST_SCORE">Highest score</option>
+                  <option value="LOWEST_SCORE">Lowest score</option>
+                </select>
+              </div>
+
+              <button
+                type="button"
+                className="clear-filters-button"
+                onClick={clearMatchFilters}
+                disabled={
+                  !searchTerm &&
+                  confidenceFilter === "ALL" &&
+                  scoreFilter === "ALL" &&
+                  sortOption === "NEWEST"
+                }
+              >
+                Clear
+              </button>
+            </div>
+          </section>
 
           {matchesQuery.isPending && (
             <LoadingState message="Loading previous matches..." />
@@ -227,15 +433,24 @@ export const MatchesPage = () => {
             />
           )}
 
-          {matchesQuery.data?.length === 0 && (
-            <div className="empty-state">
-              <h2>No previous comparisons</h2>
+          {!matchesQuery.isPending &&
+            !matchesQuery.isError &&
+            filteredMatches.length === 0 && (
+              <div className="empty-state">
+                <h2>No matching comparisons</h2>
 
-              <p>Run your first resume-job match.</p>
-            </div>
-          )}
+                <p>
+                  Try changing your search, confidence, score, or sorting
+                  options.
+                </p>
 
-          {matchesQuery.data && matchesQuery.data.length > 0 && (
+                <button type="button" onClick={clearMatchFilters}>
+                  Clear filters
+                </button>
+              </div>
+            )}
+
+          {filteredMatches.length > 0 && (
             <div className="match-table-wrapper">
               <table className="match-table">
                 <thead>
@@ -251,7 +466,7 @@ export const MatchesPage = () => {
                 </thead>
 
                 <tbody>
-                  {matchesQuery.data.map((match) => (
+                  {paginatedMatches.map((match) => (
                     <tr key={match.id}>
                       <td>{match.resume?.originalName ?? "Resume"}</td>
 
@@ -289,6 +504,50 @@ export const MatchesPage = () => {
                 </tbody>
               </table>
             </div>
+          )}
+          {filteredMatches.length > ITEMS_PER_PAGE && (
+            <nav className="pagination" aria-label="Match history pagination">
+              <button
+                type="button"
+                className="pagination-button"
+                onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+                disabled={safeCurrentPage === 1}
+              >
+                Previous
+              </button>
+
+              <div className="pagination-pages">
+                {Array.from(
+                  { length: totalPages },
+                  (_, index) => index + 1,
+                ).map((page) => (
+                  <button
+                    key={page}
+                    type="button"
+                    className={
+                      page === safeCurrentPage
+                        ? "pagination-number active"
+                        : "pagination-number"
+                    }
+                    aria-current={page === safeCurrentPage ? "page" : undefined}
+                    onClick={() => setCurrentPage(page)}
+                  >
+                    {page}
+                  </button>
+                ))}
+              </div>
+
+              <button
+                type="button"
+                className="pagination-button"
+                onClick={() =>
+                  setCurrentPage((page) => Math.min(totalPages, page + 1))
+                }
+                disabled={safeCurrentPage === totalPages}
+              >
+                Next
+              </button>
+            </nav>
           )}
         </section>
       </main>

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -20,6 +20,8 @@ import {
 } from "../hooks/useJobs";
 
 import type { Job } from "../types/job";
+
+const JOBS_PER_PAGE = 6;
 
 const jobFormSchema = z.object({
   company: z
@@ -78,6 +80,8 @@ export const JobsPage = () => {
   const [statusFilter, setStatusFilter] = useState<JobStatusFilter>("ALL");
 
   const [sortOption, setSortOption] = useState<JobSortOption>("NEWEST");
+
+  const [currentPage, setCurrentPage] = useState(1);
 
   const { toast, showToast, hideToast } = useToast();
 
@@ -138,6 +142,23 @@ export const JobsPage = () => {
       }
     });
   }, [jobsQuery.data, searchTerm, statusFilter, sortOption]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, statusFilter, sortOption]);
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredJobs.length / JOBS_PER_PAGE),
+  );
+
+  const safeCurrentPage = Math.min(currentPage, totalPages);
+
+  const paginatedJobs = useMemo(() => {
+    const startIndex = (safeCurrentPage - 1) * JOBS_PER_PAGE;
+
+    return filteredJobs.slice(startIndex, startIndex + JOBS_PER_PAGE);
+  }, [filteredJobs, safeCurrentPage]);
 
   const resetForm = () => {
     reset({
@@ -213,7 +234,16 @@ export const JobsPage = () => {
     setSearchTerm("");
     setStatusFilter("ALL");
     setSortOption("NEWEST");
+    setCurrentPage(1);
   };
+
+  const firstVisibleJob =
+    filteredJobs.length === 0 ? 0 : (safeCurrentPage - 1) * JOBS_PER_PAGE + 1;
+
+  const lastVisibleJob = Math.min(
+    safeCurrentPage * JOBS_PER_PAGE,
+    filteredJobs.length,
+  );
 
   return (
     <AppShell>
@@ -397,7 +427,9 @@ export const JobsPage = () => {
             <h2>Your jobs</h2>
 
             <span>
-              {filteredJobs.length} of {jobsQuery.data?.length ?? 0}
+              {filteredJobs.length === 0
+                ? "0 results"
+                : `${firstVisibleJob}–${lastVisibleJob} of ${filteredJobs.length}`}
             </span>
           </div>
 
@@ -426,9 +458,9 @@ export const JobsPage = () => {
               </div>
             )}
 
-          {filteredJobs.length > 0 && (
+          {paginatedJobs.length > 0 && (
             <div className="job-grid">
-              {filteredJobs.map((job) => (
+              {paginatedJobs.map((job) => (
                 <JobCard
                   key={job.id}
                   job={job}
@@ -441,6 +473,53 @@ export const JobsPage = () => {
                 />
               ))}
             </div>
+          )}
+
+          {filteredJobs.length > JOBS_PER_PAGE && (
+            <nav className="pagination" aria-label="Jobs pagination">
+              <button
+                type="button"
+                className="pagination-button"
+                onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+                disabled={safeCurrentPage === 1}
+              >
+                Previous
+              </button>
+
+              <div className="pagination-pages">
+                {Array.from(
+                  {
+                    length: totalPages,
+                  },
+                  (_, index) => index + 1,
+                ).map((page) => (
+                  <button
+                    key={page}
+                    type="button"
+                    className={
+                      page === safeCurrentPage
+                        ? "pagination-number active"
+                        : "pagination-number"
+                    }
+                    aria-current={page === safeCurrentPage ? "page" : undefined}
+                    onClick={() => setCurrentPage(page)}
+                  >
+                    {page}
+                  </button>
+                ))}
+              </div>
+
+              <button
+                type="button"
+                className="pagination-button"
+                onClick={() =>
+                  setCurrentPage((page) => Math.min(totalPages, page + 1))
+                }
+                disabled={safeCurrentPage === totalPages}
+              >
+                Next
+              </button>
+            </nav>
           )}
         </section>
       </main>

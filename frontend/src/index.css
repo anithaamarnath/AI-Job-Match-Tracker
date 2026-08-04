@@ -1488,3 +1488,66 @@ a {
     width: 100%;
   }
 }
+
+/* Pagination */
+
+.pagination {
+  margin-top: 1rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.pagination-pages {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.pagination-button,
+.pagination-number {
+  min-height: 42px;
+  padding: 0.65rem 0.9rem;
+
+  background: #ffffff;
+  color: #27334b;
+
+  border: 1px solid #d7deea;
+  border-radius: 9px;
+}
+
+.pagination-button:hover:not(:disabled),
+.pagination-number:hover:not(:disabled) {
+  background: #eef3ff;
+  color: #2457e6;
+  transform: none;
+}
+
+.pagination-number {
+  min-width: 42px;
+  padding-inline: 0.65rem;
+}
+
+.pagination-number.active {
+  background: #2457e6;
+  border-color: #2457e6;
+  color: #ffffff;
+}
+
+@media (max-width: 600px) {
+  .pagination {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .pagination-pages {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .pagination-button {
+    width: 100%;
+  }
+}

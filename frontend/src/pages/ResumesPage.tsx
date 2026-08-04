@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import axios from "axios";
 
 import { AppShell } from "../components/AppShell";
@@ -18,11 +18,16 @@ import {
 import { useToast } from "../hooks/useToast";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
+const RESUMES_PER_PAGE = 6;
 
 const allowedFileTypes = [
   "application/pdf",
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 ];
+
+type AnalysisFilter = "ALL" | "ANALYZED" | "NOT_ANALYZED";
+
+type ResumeSortOrder = "NEWEST" | "OLDEST" | "HIGHEST_ATS";
 
 const getErrorMessage = (error: unknown): string => {
   if (axios.isAxiosError(error)) {
@@ -37,17 +42,17 @@ const getErrorMessage = (error: unknown): string => {
 export const ResumesPage = () => {
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const [currentPage, setCurrentPage] = useState(1);
+
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const [resumeIdToDelete, setResumeIdToDelete] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [analysisFilter, setAnalysisFilter] = useState<
-    "ALL" | "ANALYZED" | "NOT_ANALYZED"
-  >("ALL");
 
-  const [sortOrder, setSortOrder] = useState<
-    "NEWEST" | "OLDEST" | "HIGHEST_ATS"
-  >("NEWEST");
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const [analysisFilter, setAnalysisFilter] = useState<AnalysisFilter>("ALL");
+
+  const [sortOrder, setSortOrder] = useState<ResumeSortOrder>("NEWEST");
 
   const { toast, showToast, hideToast } = useToast();
 
@@ -63,7 +68,7 @@ export const ResumesPage = () => {
 
     const filtered = resumes.filter((resume) => {
       const matchesSearch =
-        normalizedSearch === "" ||
+        !normalizedSearch ||
         resume.originalName.toLowerCase().includes(normalizedSearch);
 
       const isAnalyzed = resume.aiAtsScore !== null || resume.atsScore !== null;
@@ -76,24 +81,58 @@ export const ResumesPage = () => {
       return matchesSearch && matchesFilter;
     });
 
-    return filtered.sort((a, b) => {
-      if (sortOrder === "OLDEST") {
-        return (
-          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-        );
+    return [...filtered].sort((first, second) => {
+      switch (sortOrder) {
+        case "OLDEST":
+          return (
+            new Date(first.createdAt).getTime() -
+            new Date(second.createdAt).getTime()
+          );
+
+        case "HIGHEST_ATS": {
+          const firstScore = first.aiAtsScore ?? first.atsScore ?? -1;
+
+          const secondScore = second.aiAtsScore ?? second.atsScore ?? -1;
+
+          return secondScore - firstScore;
+        }
+
+        case "NEWEST":
+        default:
+          return (
+            new Date(second.createdAt).getTime() -
+            new Date(first.createdAt).getTime()
+          );
       }
-
-      if (sortOrder === "HIGHEST_ATS") {
-        const scoreA = a.aiAtsScore ?? a.atsScore ?? -1;
-
-        const scoreB = b.aiAtsScore ?? b.atsScore ?? -1;
-
-        return scoreB - scoreA;
-      }
-
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
   }, [resumesQuery.data, searchTerm, analysisFilter, sortOrder]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, analysisFilter, sortOrder]);
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredResumes.length / RESUMES_PER_PAGE),
+  );
+
+  const safeCurrentPage = Math.min(currentPage, totalPages);
+
+  const paginatedResumes = useMemo(() => {
+    const startIndex = (safeCurrentPage - 1) * RESUMES_PER_PAGE;
+
+    return filteredResumes.slice(startIndex, startIndex + RESUMES_PER_PAGE);
+  }, [filteredResumes, safeCurrentPage]);
+
+  const firstVisibleResume =
+    filteredResumes.length === 0
+      ? 0
+      : (safeCurrentPage - 1) * RESUMES_PER_PAGE + 1;
+
+  const lastVisibleResume = Math.min(
+    safeCurrentPage * RESUMES_PER_PAGE,
+    filteredResumes.length,
+  );
 
   const handleFileSelection = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -107,6 +146,8 @@ export const ResumesPage = () => {
       showToast("Only PDF and DOCX files are allowed.", "error");
 
       event.target.value = "";
+      setSelectedFile(null);
+
       return;
     }
 
@@ -114,6 +155,8 @@ export const ResumesPage = () => {
       showToast("The resume must be smaller than 5 MB.", "error");
 
       event.target.value = "";
+      setSelectedFile(null);
+
       return;
     }
 
@@ -123,6 +166,7 @@ export const ResumesPage = () => {
   const handleUpload = async () => {
     if (!selectedFile) {
       showToast("Select a resume before uploading.", "error");
+
       return;
     }
 
@@ -142,7 +186,6 @@ export const ResumesPage = () => {
   };
 
   const handleDeleteRequest = (resumeId: string) => {
-    console.log("Resume delete requested:", resumeId);
     setResumeIdToDelete(resumeId);
   };
 
@@ -152,8 +195,6 @@ export const ResumesPage = () => {
     }
 
     try {
-      console.log("Deleting resume:", resumeIdToDelete);
-
       await deleteMutation.mutateAsync(resumeIdToDelete);
 
       setResumeIdToDelete(null);
@@ -174,6 +215,16 @@ export const ResumesPage = () => {
     }
   };
 
+  const clearSearchAndFilters = () => {
+    setSearchTerm("");
+    setAnalysisFilter("ALL");
+    setSortOrder("NEWEST");
+    setCurrentPage(1);
+  };
+
+  const hasActiveControls =
+    Boolean(searchTerm) || analysisFilter !== "ALL" || sortOrder !== "NEWEST";
+
   return (
     <AppShell>
       <main className="page-container">
@@ -192,6 +243,7 @@ export const ResumesPage = () => {
         <section className="upload-panel">
           <div>
             <h2>Upload a new resume</h2>
+
             <p>PDF or DOCX, maximum 5 MB.</p>
           </div>
 
@@ -217,54 +269,64 @@ export const ResumesPage = () => {
           </button>
         </section>
 
-        <section className="resume-toolbar">
-          <div className="resume-search">
-            <label>Search</label>
+        <section className="list-controls-panel">
+          <div className="list-controls">
+            <div className="form-field search-field">
+              <label htmlFor="resume-search">Search resumes</label>
 
-            <input
-              type="search"
-              placeholder="Search resume..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
+              <input
+                id="resume-search"
+                type="search"
+                placeholder="Search resume name..."
+                value={searchTerm}
+                onChange={(event) => setSearchTerm(event.target.value)}
+              />
+            </div>
 
-          <div className="resume-filter">
-            <label>Filter</label>
+            <div className="form-field">
+              <label htmlFor="resume-filter">Analysis status</label>
 
-            <select
-              value={analysisFilter}
-              onChange={(e) =>
-                setAnalysisFilter(
-                  e.target.value as "ALL" | "ANALYZED" | "NOT_ANALYZED",
-                )
-              }
+              <select
+                id="resume-filter"
+                value={analysisFilter}
+                onChange={(event) =>
+                  setAnalysisFilter(event.target.value as AnalysisFilter)
+                }
+              >
+                <option value="ALL">All resumes</option>
+
+                <option value="ANALYZED">Analyzed</option>
+
+                <option value="NOT_ANALYZED">Not analyzed</option>
+              </select>
+            </div>
+
+            <div className="form-field">
+              <label htmlFor="resume-sort">Sort by</label>
+
+              <select
+                id="resume-sort"
+                value={sortOrder}
+                onChange={(event) =>
+                  setSortOrder(event.target.value as ResumeSortOrder)
+                }
+              >
+                <option value="NEWEST">Newest first</option>
+
+                <option value="OLDEST">Oldest first</option>
+
+                <option value="HIGHEST_ATS">Highest ATS score</option>
+              </select>
+            </div>
+
+            <button
+              type="button"
+              className="clear-filters-button"
+              onClick={clearSearchAndFilters}
+              disabled={!hasActiveControls}
             >
-              <option value="ALL">All resumes</option>
-
-              <option value="ANALYZED">AI Analyzed</option>
-
-              <option value="NOT_ANALYZED">Not analyzed</option>
-            </select>
-          </div>
-
-          <div className="resume-filter">
-            <label>Sort</label>
-
-            <select
-              value={sortOrder}
-              onChange={(e) =>
-                setSortOrder(
-                  e.target.value as "NEWEST" | "OLDEST" | "HIGHEST_ATS",
-                )
-              }
-            >
-              <option value="NEWEST">Newest</option>
-
-              <option value="OLDEST">Oldest</option>
-
-              <option value="HIGHEST_ATS">Highest ATS</option>
-            </select>
+              Clear
+            </button>
           </div>
         </section>
 
@@ -272,7 +334,11 @@ export const ResumesPage = () => {
           <div className="section-heading">
             <h2>Your resumes</h2>
 
-            <span>{filteredResumes.length} shown</span>
+            <span>
+              {filteredResumes.length === 0
+                ? "0 results"
+                : `${firstVisibleResume}–${lastVisibleResume} of ${filteredResumes.length}`}
+            </span>
           </div>
 
           {resumesQuery.isPending && (
@@ -288,28 +354,36 @@ export const ResumesPage = () => {
             />
           )}
 
-          {resumesQuery.data?.length === 0 && (
-            <div className="empty-state">
-              <h2>No resumes uploaded</h2>
+          {!resumesQuery.isPending &&
+            !resumesQuery.isError &&
+            (resumesQuery.data?.length ?? 0) === 0 && (
+              <div className="empty-state">
+                <h2>No resumes uploaded</h2>
 
-              <p>
-                Upload your first resume to start analysis and job matching.
-              </p>
-            </div>
-          )}
+                <p>
+                  Upload your first resume to start analysis and job matching.
+                </p>
+              </div>
+            )}
 
-          {resumesQuery.data && resumesQuery.data.length > 0 && (
+          {!resumesQuery.isPending &&
+            !resumesQuery.isError &&
+            (resumesQuery.data?.length ?? 0) > 0 &&
+            filteredResumes.length === 0 && (
+              <div className="empty-state">
+                <h2>No matching resumes</h2>
+
+                <p>Try changing your search, filter, or sorting options.</p>
+
+                <button type="button" onClick={clearSearchAndFilters}>
+                  Clear filters
+                </button>
+              </div>
+            )}
+
+          {paginatedResumes.length > 0 && (
             <div className="resume-grid">
-              {resumesQuery.data &&
-                resumesQuery.data.length > 0 &&
-                filteredResumes.length === 0 && (
-                  <div className="empty-state">
-                    <h2>No matching resumes</h2>
-
-                    <p>Try another search or filter.</p>
-                  </div>
-                )}
-              {filteredResumes.map((resume) => (
+              {paginatedResumes.map((resume) => (
                 <ResumeCard
                   key={resume.id}
                   resume={resume}
@@ -326,6 +400,53 @@ export const ResumesPage = () => {
                 />
               ))}
             </div>
+          )}
+
+          {filteredResumes.length > RESUMES_PER_PAGE && (
+            <nav className="pagination" aria-label="Resume pagination">
+              <button
+                type="button"
+                className="pagination-button"
+                onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+                disabled={safeCurrentPage === 1}
+              >
+                Previous
+              </button>
+
+              <div className="pagination-pages">
+                {Array.from(
+                  {
+                    length: totalPages,
+                  },
+                  (_, index) => index + 1,
+                ).map((page) => (
+                  <button
+                    key={page}
+                    type="button"
+                    className={
+                      page === safeCurrentPage
+                        ? "pagination-number active"
+                        : "pagination-number"
+                    }
+                    aria-current={page === safeCurrentPage ? "page" : undefined}
+                    onClick={() => setCurrentPage(page)}
+                  >
+                    {page}
+                  </button>
+                ))}
+              </div>
+
+              <button
+                type="button"
+                className="pagination-button"
+                onClick={() =>
+                  setCurrentPage((page) => Math.min(totalPages, page + 1))
+                }
+                disabled={safeCurrentPage === totalPages}
+              >
+                Next
+              </button>
+            </nav>
           )}
         </section>
       </main>
