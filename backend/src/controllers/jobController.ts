@@ -23,8 +23,7 @@ import type {
 
 import { AppError } from "../utils/AppError.js";
 
-export interface JobParams
-  extends ParamsDictionary {
+export interface JobParams extends ParamsDictionary {
   id: string;
 }
 
@@ -62,16 +61,14 @@ export const createJob = async (
     const userId =
       getAuthenticatedUserId(req);
 
-    const job =
-      await createJobService(
-        userId,
-        req.body
-      );
+    const job = await createJobService(
+      userId,
+      req.body
+    );
 
     res.status(201).json({
       success: true,
-      message:
-        "Job created successfully",
+      message: "Job created successfully",
       data: job,
     });
   } catch (error) {
@@ -93,8 +90,7 @@ export const getJobs = async (
 
     res.status(200).json({
       success: true,
-      message:
-        "Jobs retrieved successfully",
+      message: "Jobs retrieved successfully",
       data: jobs,
     });
   } catch (error) {
@@ -111,16 +107,14 @@ export const getJobById = async (
     const userId =
       getAuthenticatedUserId(req);
 
-    const job =
-      await getJobByIdService(
-        userId,
-        req.params.id
-      );
+    const job = await getJobByIdService(
+      userId,
+      req.params.id
+    );
 
     res.status(200).json({
       success: true,
-      message:
-        "Job retrieved successfully",
+      message: "Job retrieved successfully",
       data: job,
     });
   } catch (error) {
@@ -170,17 +164,15 @@ export const updateJob = async (
         req.body.status;
     }
 
-    const job =
-      await updateJobService(
-        userId,
-        req.params.id,
-        updateData
-      );
+    const job = await updateJobService(
+      userId,
+      req.params.id,
+      updateData
+    );
 
     res.status(200).json({
       success: true,
-      message:
-        "Job updated successfully",
+      message: "Job updated successfully",
       data: job,
     });
   } catch (error) {
@@ -204,8 +196,7 @@ export const deleteJob = async (
 
     res.status(200).json({
       success: true,
-      message:
-        "Job deleted successfully",
+      message: "Job deleted successfully",
     });
   } catch (error) {
     next(error);

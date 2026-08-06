@@ -44,9 +44,8 @@ export const createJobSchema = z.object({
     ),
 });
 
-export type CreateJobInput = z.infer<
-  typeof createJobSchema
->;
+export type CreateJobInput =
+  z.infer<typeof createJobSchema>;
 
 export const updateJobSchema = createJobSchema
   .partial()
@@ -56,16 +55,20 @@ export const updateJobSchema = createJobSchema
         message: "Status must be a string",
       })
       .trim()
-      .min(1, "Status cannot be empty")
+      .min(
+        1,
+        "Status cannot be empty"
+      )
       .optional(),
   })
   .refine(
-    (data) => Object.keys(data).length > 0,
+    (data) =>
+      Object.keys(data).length > 0,
     {
-      message: "At least one field is required",
+      message:
+        "At least one field is required",
     }
   );
 
-export type UpdateJobInput = z.infer<
-  typeof updateJobSchema
->;
+export type UpdateJobInput =
+  z.infer<typeof updateJobSchema>;
