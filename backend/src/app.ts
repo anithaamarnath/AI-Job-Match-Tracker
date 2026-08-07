@@ -15,31 +15,26 @@ import { notFound } from "./middleware/notFound.js";
 
 export const app = express();
 
-app.use(cors());
+const allowedOrigins = [
+  "http://localhost:5173",
+  process.env.FRONTEND_URL,
+].filter((origin): origin is string => Boolean(origin));
+
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+  })
+);
+
 app.use(express.json());
 
 app.use("/health", healthRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/features", featureRoutes);
-
-/*
- * Job CRUD:
- * company, role, description
- */
 app.use("/api/jobs", jobRoutes);
-
-/*
- * Older direct job-description matching feature:
- * resumeId, jobDescription
- */
 app.use("/api/match", jobMatchRoutes);
-
-/*
- * Saved resume-to-saved-job matching:
- * resumeId, jobId
- */
 app.use("/api/matches", resumeJobMatchRoutes);
-
 app.use("/api/resume", resumeRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 
