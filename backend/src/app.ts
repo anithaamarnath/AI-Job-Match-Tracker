@@ -17,21 +17,44 @@ export const app = express();
 
 const allowedOrigins = [
   "http://localhost:5173",
+  "https://ai-job-match-tracker-anithaamarnaths-projects.vercel.app",
   process.env.FRONTEND_URL,
 ].filter((origin): origin is string => Boolean(origin));
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (!origin) {
         callback(null, true);
         return;
       }
+
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+        return;
+      }
+
+      console.error("CORS blocked origin:", origin);
 
       callback(
         new Error(`CORS blocked origin: ${origin}`)
       );
     },
+
+    methods: [
+      "GET",
+      "POST",
+      "PUT",
+      "PATCH",
+      "DELETE",
+      "OPTIONS",
+    ],
+
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+    ],
+
     credentials: true,
   })
 );
